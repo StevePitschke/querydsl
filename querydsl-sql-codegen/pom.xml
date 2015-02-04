@@ -11,6 +11,7 @@
 
   <groupId>com.mysema.querydsl</groupId>
   <artifactId>querydsl-sql-codegen</artifactId>
+  <version>3.6.3.BUILD-SNAPSHOT</version>
   <name>Querydsl - SQL codegen support</name>
   <description>SQL codegen support for Querydsl</description>
   <packaging>jar</packaging>
@@ -23,17 +24,17 @@
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-codegen</artifactId>
-      <version>${project.version}</version>
+      <version>3.6.2.BUILD-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-sql</artifactId>
-      <version>${project.version}</version>
+      <version>3.6.2.BUILD-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-spatial</artifactId>
-      <version>${project.version}</version>
+      <version>3.6.2.BUILD-SNAPSHOT</version>
     </dependency>        
 
     <dependency>
@@ -58,7 +59,7 @@
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-sql</artifactId>
-      <version>${project.version}</version>
+      <version>3.6.2.BUILD-SNAPSHOT</version>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>           
@@ -90,7 +91,7 @@
     <dependency>
       <groupId>com.oracle</groupId>
       <artifactId>ojdbc6</artifactId>
-      <version>11.1.0.7.0</version>
+      <version>11.2.0.4</version>
       <scope>test</scope>
     </dependency>
           
@@ -109,7 +110,7 @@
     <dependency>
       <groupId>org.opengeo</groupId>
       <artifactId>geodb</artifactId>
-      <version>0.7</version>
+      <version>0.8</version>
       <scope>test</scope>
     </dependency>
 
@@ -123,7 +124,7 @@
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-core</artifactId>
-      <version>${project.version}</version>
+      <version>3.6.2.BUILD-SNAPSHOT</version>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>       
@@ -193,7 +194,7 @@
       <plugin>
         <groupId>com.mysema.querydsl</groupId>
         <artifactId>querydsl-maven-plugin</artifactId>
-        <version>${project.version}</version>
+        <version>3.6.2.BUILD-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>

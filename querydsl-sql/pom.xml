@@ -12,6 +12,7 @@
   <groupId>com.mysema.querydsl</groupId>
   <artifactId>querydsl-sql</artifactId>
   <name>Querydsl - SQL support</name>
+  <version>3.6.3.BUILD-SNAPSHOT</version>
   <description>SQL support for Querydsl</description>
   <packaging>jar</packaging>
 
@@ -28,18 +29,18 @@
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-core</artifactId>
-      <version>${project.version}</version>
+      <version>3.6.2.BUILD-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-spatial</artifactId>
-      <version>${project.version}</version>
+      <version>3.6.2.BUILD-SNAPSHOT</version>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.vividsolutions</groupId>
       <artifactId>jts</artifactId>
-      <version>1.10</version>
+      <version>1.11</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -134,7 +135,7 @@
     <dependency>
       <groupId>org.opengeo</groupId>
       <artifactId>geodb</artifactId>
-      <version>0.7</version>
+      <version>0.8</version>
       <scope>test</scope>
     </dependency>
     
@@ -161,7 +162,7 @@
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-core</artifactId>
-      <version>${project.version}</version>
+      <version>3.6.2.BUILD-SNAPSHOT</version>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>    
@@ -194,7 +195,7 @@
   </dependencies>
   
   <build>
-    <plugins>
+    <plugins><!-- 
       <plugin>
         <groupId>com.infradna.tool</groupId>
         <artifactId>bridge-method-injector</artifactId>
@@ -225,7 +226,7 @@
             <version>1.2</version>
           </dependency>
         </dependencies>
-      </plugin>
+      </plugin> -->
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -271,7 +272,7 @@
       <plugin>
         <groupId>com.mysema.querydsl</groupId>
         <artifactId>querydsl-maven-plugin</artifactId>
-        <version>${project.version}</version>
+        <version>3.6.2.BUILD-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>

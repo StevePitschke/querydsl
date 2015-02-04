@@ -73,6 +73,10 @@ public enum Target{
     /**
      *
      */
-    LUCENE;
+    LUCENE,
+    /**
+     * Rocket U2 UniVerse
+     */
+    UNIVERSE;
 
 }

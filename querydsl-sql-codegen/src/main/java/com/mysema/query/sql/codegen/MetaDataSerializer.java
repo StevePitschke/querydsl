@@ -338,7 +338,11 @@ public class MetaDataSerializer extends EntitySerializer {
     protected void serializePrimaryKeys(EntityType model, CodeWriter writer,
             Collection<PrimaryKeyData> primaryKeys) throws IOException {
         for (PrimaryKeyData primaryKey : primaryKeys) {
-            String fieldName = namingStrategy.getPropertyNameForPrimaryKey(primaryKey.getName(), model);
+        	String primaryKeyName = primaryKey.getName().trim();
+        	if (primaryKeyName.length() == 0) {
+        		primaryKeyName = primaryKey.getColumns().get(0);
+        	}
+            String fieldName = namingStrategy.getPropertyNameForPrimaryKey(primaryKeyName, model);
             StringBuilder value = new StringBuilder("createPrimaryKey(");
             boolean first = true;
             for (String column : primaryKey.getColumns()) {
