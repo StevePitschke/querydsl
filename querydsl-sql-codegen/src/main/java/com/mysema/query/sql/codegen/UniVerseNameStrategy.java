@@ -14,23 +14,39 @@
 
 package com.mysema.query.sql.codegen;
 
+import java.util.Locale;
+
+import com.mysema.query.codegen.EntityType;
+
 /**
  * @author Steve Pitschke
  */
 public class UniVerseNameStrategy extends DefaultNamingStrategy {
 
     @Override
-    public String normalizeTableName(String tableName) {
-        if (tableName != null) {
-            tableName = tableName.replaceAll("\r", "").replaceAll("\n", " ");
+    public String getDefaultVariableName(EntityType entityType) {
+    	
+    	String tableName = entityType.getData().get("table").toString();
+        int periodT = tableName.indexOf(".T");
+        if (periodT > 0) {
+        	tableName = tableName.substring(0, periodT) +
+        		((periodT == tableName.length() - 2) ? "" : tableName.substring(periodT + 2));
+        }    	
+        return escape(entityType, toCamelCase(tableName));
+    }
+
+    @Override
+    public String getClassName(String tableName) {
+        if (tableName.length() > 1) {
             int periodT = tableName.indexOf(".T");
             if (periodT > 0) {
             	tableName = tableName.substring(0, periodT) +
             		((periodT == tableName.length() - 2) ? "" : tableName.substring(periodT + 2));
             }
-            return tableName;
+            return tableName.substring(0, 1).toUpperCase(Locale.ENGLISH) +
+                    toCamelCase(tableName.substring(1));
         } else {
-            return null;
+            return tableName.toUpperCase(Locale.ENGLISH);
         }
     }
 }

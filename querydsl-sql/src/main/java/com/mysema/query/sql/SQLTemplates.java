@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -834,7 +834,7 @@ public class SQLTemplates extends Templates {
         return quoteIdentifier(identifier, false);
     }
 
-    public final String quoteIdentifier(String identifier, boolean precededByDot) {
+    public String quoteIdentifier(String identifier, boolean precededByDot) {
         if (useQuotes || requiresQuotes(identifier, precededByDot)) {
             return quoteStr + identifier + quoteStr;
         } else {
