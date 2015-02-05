@@ -47,7 +47,7 @@ public class DoQueryActs {
         SQLTemplates dialect = new UniVerseTemplates(); // SQL-dialect
         UniVerseQuery query = new UniVerseQuery(conn, dialect); 
         List<Tuple> results = query.from(acts)
-        	.leftJoin(actsAnimal).on(acts.actNo.eq(actsAnimal.actNo))
+        	.outerJoin(actsAnimal).on(acts.actNo.eq(actsAnimal.actNo))
         	.join(livestock).on(actsAnimal.animalId.eq(livestock.animalId))
             .where(acts.description.like("%the%"))
             .list(acts.actNo, acts.description, livestock.description);
