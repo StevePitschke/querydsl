@@ -217,6 +217,8 @@ public class SQLTemplates extends Templates {
 
     private String rightJoin = "\nright join ";;
 
+    private String outerJoin = "\nleft outer join ";;
+
     private String limitTemplate = "\nlimit {0}";
 
     private String mergeInto = "merge into ";
@@ -625,6 +627,7 @@ public class SQLTemplates extends Templates {
             case FULLJOIN:  return fullJoin;
             case LEFTJOIN:  return leftJoin;
             case RIGHTJOIN: return rightJoin;
+            case OUTERJOIN: return outerJoin;
             default:       return ", ";
         }
     }

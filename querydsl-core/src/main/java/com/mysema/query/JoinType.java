@@ -42,7 +42,11 @@ public enum JoinType {
     /**
      * full join
      */
-    FULLJOIN(false, true);
+    FULLJOIN(false, true),
+    /**
+     * outer join
+     */
+    OUTERJOIN(false, true);
 
     private final boolean inner, outer;
     
