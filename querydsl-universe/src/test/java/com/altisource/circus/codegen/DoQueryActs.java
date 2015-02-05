@@ -21,8 +21,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.List;
 
-import com.altisource.circus.entity.ActsEntity;
 import com.altisource.circus.query.QueryActs;
+import com.altisource.circus.query.QueryActsAnimalId;
+import com.altisource.circus.query.QueryLivestock;
 import com.mysema.query.Tuple;
 import com.mysema.query.sql.SQLTemplates;
 import com.mysema.query.sql.UniVerseTemplates;
@@ -40,15 +41,19 @@ public class DoQueryActs {
         Connection conn = DriverManager.getConnection(url, "ASCORP\\pitschke", "XXX");
         
         QueryActs acts = new QueryActs("c");
+        QueryActsAnimalId actsAnimal = new QueryActsAnimalId("d");
+        QueryLivestock livestock = new QueryLivestock("e");
 
         SQLTemplates dialect = new UniVerseTemplates(); // SQL-dialect
         UniVerseQuery query = new UniVerseQuery(conn, dialect); 
-        List<ActsEntity> results = query.from(acts)
+        List<Tuple> results = query.from(acts)
+        	.leftJoin(actsAnimal).on(acts.actNo.eq(actsAnimal.actNo))
+        	.join(livestock).on(actsAnimal.animalId.eq(livestock.animalId))
             .where(acts.description.like("%the%"))
-            .list(acts.getProjection());
+            .list(acts.actNo, acts.description, livestock.description);
         
-        for (ActsEntity row : results) {
-        	System.out.println(row.getActNo() + "\t" + row.getDescription());
+        for (Tuple row : results) {
+        	System.out.println(row.get(acts.actNo).toString() + "\t" + row.get(acts.description).toString() + "\t" + row.get(livestock.description).toString());
         }
         
         conn.close();
