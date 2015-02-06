@@ -38,7 +38,7 @@ public class DoQueryActs {
     	
         Class.forName("com.rs.u2.jdbc.UniJDBCDriver");
         String url = "jdbc:rs-u2://localhost/C:/U2/UV/HS.ADMIN;dbmstype=UNIVERSE";
-        Connection conn = DriverManager.getConnection(url, "ASCORP\\pitschke", "XXX");
+        Connection conn = DriverManager.getConnection(url, "ASCORP\\pitschke", "Ora1nge++");
         
         QueryActs acts = new QueryActs("c");
         QueryActsAnimalId actsAnimal = new QueryActsAnimalId("d");
@@ -50,10 +50,10 @@ public class DoQueryActs {
         	.outerJoin(actsAnimal).on(acts.actNo.eq(actsAnimal.actNo))
         	.join(livestock).on(actsAnimal.animalId.eq(livestock.animalId))
             .where(acts.description.like("%the%"))
-            .list(acts.actNo, acts.description, livestock.description);
+            .list(acts.actNo, acts.animalId, acts.description, livestock.description);
         
         for (Tuple row : results) {
-        	System.out.println(row.get(acts.actNo).toString() + "\t" + row.get(acts.description).toString() + "\t" + row.get(livestock.description).toString());
+        	System.out.println(row.get(acts.actNo) + "\t" + row.get(acts.description) + "\t" + row.get(livestock.description));
         }
         
         conn.close();
