@@ -14,10 +14,12 @@
 package com.mysema.query.sql.codegen;
 
 import javax.annotation.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,6 +36,7 @@ import com.mysema.codegen.model.TypeCategory;
 import com.mysema.query.codegen.*;
 import com.mysema.query.sql.*;
 import com.mysema.query.sql.support.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +88,8 @@ public class MetaDataExporter {
     private NamingStrategy namingStrategy;
 
     private Configuration configuration;
+    
+    private MultiValueColumn multiValueColumn;
 
     private KeyDataFactory keyDataFactory;
 
@@ -186,6 +191,7 @@ public class MetaDataExporter {
         beanSerializer = module.get(Serializer.class, SQLCodegenModule.BEAN_SERIALIZER);
         namingStrategy = module.get(NamingStrategy.class);
         configuration = module.get(Configuration.class);
+        multiValueColumn = module.get(MultiValueColumn.class);
 
         SQLTemplates templates = sqlTemplatesRegistry.getTemplates(md);
         if (templates != null) {
@@ -221,12 +227,14 @@ public class MetaDataExporter {
             typesArray = types.toArray(new String[types.size()]);
         }
 
+        List<EntityType> tableClasses = new ArrayList<EntityType>();
+        
         if (tableNamePattern != null && tableNamePattern.contains(",")) {
             for (String table : tableNamePattern.split(",")) {
                 ResultSet tables = md.getTables(null, schemaPattern, table.trim(), typesArray);
                 try{
                     while (tables.next()) {
-                        handleTable(md, tables);
+                    	tableClasses.add(handleTable(md, tables));
                     }
                 }finally{
                     tables.close();
@@ -236,20 +244,23 @@ public class MetaDataExporter {
             ResultSet tables = md.getTables(null, schemaPattern, tableNamePattern, typesArray);
             try{
                 while (tables.next()) {
-                    handleTable(md, tables);
+                	tableClasses.add(handleTable(md, tables));
                 }
             }finally{
                 tables.close();
             }
         }
-
+        
+        for (EntityType classModel : tableClasses) {
+        	serialize(classModel);
+        }
     }
 
     Set<String> getClasses() {
         return classes;
     }
 
-    private void handleColumn(EntityType classModel, String tableName, ResultSet columns) throws SQLException {
+    private boolean handleColumn(EntityType classModel, Connection conn, String schema, String tableName, ResultSet columns) throws SQLException {
         String columnName = normalize(columns.getString("COLUMN_NAME"));
         String normalizedColumnName = namingStrategy.normalizeColumnName(columnName);
         int columnType = columns.getInt("DATA_TYPE");
@@ -258,6 +269,7 @@ public class MetaDataExporter {
         Number columnDigits = (Number) columns.getObject("DECIMAL_DIGITS");
         int columnIndex = columns.getInt("ORDINAL_POSITION");
         int nullable = columns.getInt("NULLABLE");
+        boolean isMultiValued = multiValueColumn.isMultiValue(conn, schema, tableName, columnName);
 
         String propertyName = namingStrategy.getPropertyName(normalizedColumnName, classModel);
         Class<?> clazz = configuration.getJavaType(columnType,
@@ -301,9 +313,11 @@ public class MetaDataExporter {
             }
         }
         classModel.addProperty(property);
+        
+        return isMultiValued;
     }
 
-    private void handleTable(DatabaseMetaData md, ResultSet tables) throws SQLException {
+    private EntityType handleTable(DatabaseMetaData md, ResultSet tables) throws SQLException {
         String catalog = tables.getString("TABLE_CAT");
         String schema = tables.getString("TABLE_SCHEM");
         String schemaName = normalize(tables.getString("TABLE_SCHEM"));
@@ -311,6 +325,8 @@ public class MetaDataExporter {
         String normalizedTableName = namingStrategy.normalizeTableName(tableName);
         String className = namingStrategy.getClassName(normalizedTableName);
         EntityType classModel = createEntityType(schemaName, normalizedTableName, className);
+        
+        classModel.setBaseTable(multiValueColumn.isBaseTable(md.getConnection(), schema, tableName));
 
         if (exportPrimaryKeys) {
             // collect primary keys
@@ -341,16 +357,17 @@ public class MetaDataExporter {
         ResultSet columns = md.getColumns(catalog, schema, tableName.replace("/", "//"), null);
         try{
             while (columns.next()) {
-                handleColumn(classModel, tableName, columns);
+                if (handleColumn(classModel, md.getConnection(), schema, tableName, columns)) {
+                	classModel.setHasMultiValuedColumns(true);
+                }
             }
         }finally{
             columns.close();
         }
 
-        // serialize model
-        serialize(classModel);
-
         logger.info("Exported " + tableName + " successfully");
+        
+        return classModel;
     }
 
     private String normalize(String str) {
@@ -364,16 +381,58 @@ public class MetaDataExporter {
     private void serialize(EntityType type) {
         try {
             String fileSuffix = createScalaSources ? ".scala" : ".java";
+            String packageSuffix = "";
+        	
+        	if (! type.isBaseTable()) {
+        		
+        		Type oldSimpleType = type.getInnerType();
+        		String packageName = oldSimpleType.getPackageName() + ".impl";
+        		String simpleName = oldSimpleType.getSimpleName();
+        		String beanSuffix = module.getBeanSuffix();
+        		
+        		if (beanSuffix != null && beanSuffix.length() > 0) {
+        			simpleName = simpleName.substring(0, simpleName.length() - beanSuffix.length()) +
+        				"Impl" + beanSuffix;
+        		} else {
+        			simpleName += "Impl";
+        		}
+        		
+                Type classTypeModel = new SimpleType(oldSimpleType.getCategory(),
+                		packageName + "." + simpleName,  packageName, simpleName, false, false);
+                
+        		EntityType newType = new EntityType(classTypeModel);
+        		
+        		newType.getData().put("schema", type.getData().get("schema"));
+        		newType.getData().put("table", type.getData().get("table"));
+                
+                for (Property property : type.getProperties()) {
+                	newType.addProperty(property);
+                }
+                
+                type = newType;
+                
+                if (beanSerializer == null) {
+                    typeMappings.register(type, type);
+                } else {
+                	Type mappedType = queryTypeFactory.create(type);
+                
+                	entityToWrapped.put(type, mappedType);
+                    typeMappings.register(type, mappedType);
+                }
+                
+                packageSuffix = ".impl";
+        	}
 
             if (beanSerializer != null) {
-                String packageName = normalizePackage(beanPackageName, (String)type.getData().get("schema"));
+            	
+                String packageName = normalizePackage(beanPackageName + packageSuffix, (String)type.getData().get("schema"));
                 String path = packageName.replace('.', '/') + "/" + type.getSimpleName() + fileSuffix;
                 write(beanSerializer, path, type);
 
                 String otherPath = entityToWrapped.get(type).getFullName().replace('.', '/') + fileSuffix;
                 write(serializer, otherPath, type);
             } else {
-                String packageName = normalizePackage(module.getPackageName(), (String)type.getData().get("schema"));
+                String packageName = normalizePackage(module.getPackageName() + packageSuffix, (String)type.getData().get("schema"));
                 String path =  packageName.replace('.', '/') + "/" + type.getSimpleName() + fileSuffix;
                 write(serializer, path, type);
             }
@@ -519,6 +578,15 @@ public class MetaDataExporter {
      */
     public void setNamingStrategy(NamingStrategy namingStrategy) {
         module.bind(NamingStrategy.class, namingStrategy);
+    }
+
+    /**
+     * Override the MultiColumnValue (default: new DefaultMultiColumnValue())
+     *
+     * @param multiValueColumn namingstrategy to override (default: new DefaultMultiColumnValue())
+     */
+    public void setMultiValueColumn(MultiValueColumn multiValueColumn) {
+        module.bind(MultiValueColumn.class, multiValueColumn);
     }
 
     /**

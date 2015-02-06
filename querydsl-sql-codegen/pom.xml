@@ -24,17 +24,17 @@
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-codegen</artifactId>
-      <version>3.6.2.BUILD-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-sql</artifactId>
-      <version>3.6.2.BUILD-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-spatial</artifactId>
-      <version>3.6.2.BUILD-SNAPSHOT</version>
+      <version>${parent.version}</version>
     </dependency>        
 
     <dependency>
@@ -55,14 +55,7 @@
         <scope>provided</scope>
     </dependency>    
 
-    <!-- test -->
-    <dependency>
-      <groupId>com.mysema.querydsl</groupId>
-      <artifactId>querydsl-sql</artifactId>
-      <version>3.6.2.BUILD-SNAPSHOT</version>
-      <scope>test</scope>
-      <type>test-jar</type>
-    </dependency>           
+    <!-- test -->           
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
