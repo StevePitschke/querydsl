@@ -14,6 +14,7 @@
 package com.mysema.query.codegen;
 
 import javax.annotation.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -50,6 +51,10 @@ public class EntityType extends TypeAdapter implements Comparable<EntityType> {
     private final Map<Object, Object> data = new HashMap<Object,Object>();
 
     private String uncapSimpleName;
+    
+    private boolean isBaseTable;
+    
+    private boolean hasMultiValuedColumns;
     
     /**
      * Create a new EntityType instance for the given type
@@ -171,7 +176,7 @@ public class EntityType extends TypeAdapter implements Comparable<EntityType> {
         return superTypes;
     }
 
-    public String getUncapSimpleName() {
+	public String getUncapSimpleName() {
         return uncapSimpleName;
     }
 
@@ -252,4 +257,20 @@ public class EntityType extends TypeAdapter implements Comparable<EntityType> {
     public Type getInnerType() {
         return type;
     }
+
+	public boolean isBaseTable() {
+		return isBaseTable;
+	}
+
+	public void setBaseTable(boolean isBaseTable) {
+		this.isBaseTable = isBaseTable;
+	}
+
+	public boolean hasMultiValuedColumns() {
+		return hasMultiValuedColumns;
+	}
+
+	public void setHasMultiValuedColumns(boolean hasMultiValuedColumns) {
+		this.hasMultiValuedColumns = hasMultiValuedColumns;
+	}
 }

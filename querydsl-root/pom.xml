@@ -204,7 +204,7 @@
       </plugins>      
     </pluginManagement>
     
-    <plugins>
+    <plugins><!-- 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -238,7 +238,7 @@
             <version>0.9.27</version>
           </dependency>
         </dependencies>
-      </plugin>
+      </plugin> -->
       <plugin>       
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>

@@ -21,9 +21,12 @@ import java.util.Comparator;
 
 import com.mysema.codegen.model.SimpleType;
 import com.mysema.query.codegen.BeanSerializer;
+import com.mysema.query.sql.codegen.DefaultMultiValueColumn;
 import com.mysema.query.sql.codegen.DefaultNamingStrategy;
 import com.mysema.query.sql.codegen.MetaDataExporter;
+import com.mysema.query.sql.codegen.MultiValueColumn;
 import com.mysema.query.sql.codegen.NamingStrategy;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
@@ -223,6 +226,7 @@ public class AntMetaDataExporter extends Task {
             dbConn = DriverManager.getConnection(dbUrl, dbUserName, dbPassword);
 
             NamingStrategy namingStrategy = new DefaultNamingStrategy();
+            MultiValueColumn multiValueCoumn = new DefaultMultiValueColumn();
             MetaDataExporter exporter = new MetaDataExporter();
             if (namePrefix != null) {
                 exporter.setNamePrefix(namePrefix);
@@ -239,7 +243,7 @@ public class AntMetaDataExporter extends Task {
             exporter.setPackageName(targetPackage);
             exporter.setBeanPackageName(beanTargetPackage);
             exporter.setTargetFolder(targetPackagePath);
-            exporter.setNamingStrategy(namingStrategy);
+            exporter.setMultiValueColumn(multiValueCoumn);
             exporter.setInnerClassesForKeys(innerClassesForKeys);
             exporter.setSchemaPattern(schemaPattern);
             exporter.setTableNamePattern(tableNamePattern);
