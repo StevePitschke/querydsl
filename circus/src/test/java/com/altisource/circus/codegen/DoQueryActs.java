@@ -22,8 +22,8 @@ import java.sql.DriverManager;
 import java.util.List;
 
 import com.altisource.circus.query.QueryActs;
-import com.altisource.circus.query.QueryActsAnimalId;
 import com.altisource.circus.query.QueryLivestock;
+import com.altisource.circus.query.impl.QueryActsAnimalIdImpl;
 import com.mysema.query.Tuple;
 import com.mysema.query.sql.SQLTemplates;
 import com.mysema.query.sql.UniVerseTemplates;
@@ -41,7 +41,7 @@ public class DoQueryActs {
         Connection conn = DriverManager.getConnection(url, "ASCORP\\pitschke", "Ora1nge++");
         
         QueryActs acts = new QueryActs("c");
-        QueryActsAnimalId actsAnimal = new QueryActsAnimalId("d");
+        QueryActsAnimalIdImpl actsAnimal = new QueryActsAnimalIdImpl("d");
         QueryLivestock livestock = new QueryLivestock("e");
 
         SQLTemplates dialect = new UniVerseTemplates(); // SQL-dialect

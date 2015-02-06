@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 
 import com.mysema.query.codegen.BeanSerializer;
 import com.mysema.query.sql.codegen.MetaDataExporter;
+import com.mysema.query.sql.codegen.UniVerseMultiValueColumn;
 import com.mysema.query.sql.codegen.UniVerseNameStrategy;
 
 
@@ -21,7 +22,7 @@ public class Export {
         exporter.setPackageName("com.altisource.circus.query");
         exporter.setTargetFolder(new File("../circus/src/main/java"));
         exporter.setNamingStrategy(new UniVerseNameStrategy());
-//        exporter.setMultiValueColumn(new UniVerseMultiValueColumn());
+        exporter.setMultiValueColumn(new UniVerseMultiValueColumn());
 //        exporter.setLowerCase(true);
         exporter.setExportForeignKeys(false);
         exporter.setBeanSuffix("Entity");

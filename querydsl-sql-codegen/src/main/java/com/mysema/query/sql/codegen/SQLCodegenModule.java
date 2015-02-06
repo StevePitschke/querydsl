@@ -52,6 +52,7 @@ public class SQLCodegenModule extends CodegenModule{
     protected void configure() {
         super.configure();
         bind(NamingStrategy.class, DefaultNamingStrategy.class);
+        bind(MultiValueColumn.class, DefaultMultiValueColumn.class);
         bind(Configuration.class, new Configuration(SQLTemplates.DEFAULT));
         bind(Serializer.class, MetaDataSerializer.class);
         bind(QueryTypeFactory.class, SQLQueryTypeFactory.class);
