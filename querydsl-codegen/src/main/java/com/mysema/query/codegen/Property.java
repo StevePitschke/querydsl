@@ -41,7 +41,7 @@ public final class Property implements Comparable<Property> {
 
     private final Type type;
     
-    private final Class<?> subQuery;
+    private final Type subQuery;
 
     public Property(EntityType declaringType, String name, Type type) {
         this(declaringType, name, type, Collections.<String>emptyList(), false);
@@ -63,7 +63,7 @@ public final class Property implements Comparable<Property> {
     }
 
     public Property(EntityType declaringType, String name, String escapedName, Type type,
-            List<String> inits, boolean inherited, Class<?> subQuery) {
+            List<String> inits, boolean inherited, Type subQuery) {
         this.declaringType = declaringType;
         this.name = name;
         this.escapedName = escapedName;
@@ -158,7 +158,7 @@ public final class Property implements Comparable<Property> {
         return inherited;
     }
 
-    public Class<?> getSubQuery() {
+    public Type getSubQuery() {
 		return subQuery;
 	}
     

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,14 +159,15 @@ public class MetaDataExporter {
     }
 
     protected Property createProperty(EntityType classModel, String normalizedColumnName,
-            String propertyName, Type typeModel) {
+            String propertyName, Type typeModel, Type subQuery) {
         return new Property(
                 classModel,
                 propertyName,
                 propertyName,
                 typeModel,
                 Collections.<String>emptyList(),
-                false);
+                false,
+                subQuery);
     }
 
     /**
@@ -252,7 +253,7 @@ public class MetaDataExporter {
         }
         
         for (EntityType classModel : tableClasses) {
-        	serialize(classModel);
+        	serialize(classModel, tableClasses, md.getConnection());
         }
     }
 
@@ -287,7 +288,7 @@ public class MetaDataExporter {
             fieldType = TypeCategory.ENUM;
         }
         Type typeModel = new ClassType(fieldType, clazz);
-        Property property = createProperty(classModel, normalizedColumnName, propertyName, typeModel);
+        Property property = createProperty(classModel, normalizedColumnName, propertyName, typeModel, isMultiValued ? typeModel : null);
         ColumnMetadata column = ColumnMetadata.named(normalizedColumnName).ofType(columnType).withIndex(columnIndex);
         if (nullable == DatabaseMetaData.columnNoNulls) {
             column = column.notNull();
@@ -377,48 +378,121 @@ public class MetaDataExporter {
             return str;
         }
     }
+    
+    private EntityType makeImplType(EntityType type) {
+    	
+		Type oldSimpleType = type.getInnerType();
+		String packageName = oldSimpleType.getPackageName() + ".impl";
+		String simpleName = oldSimpleType.getSimpleName();
+		String beanSuffix = module.getBeanSuffix();
+		
+		if (beanSuffix != null && beanSuffix.length() > 0) {
+			simpleName = simpleName.substring(0, simpleName.length() - beanSuffix.length()) +
+				"Impl" + beanSuffix;
+		} else {
+			simpleName += "Impl";
+		}
+		
+        Type classTypeModel = new SimpleType(oldSimpleType.getCategory(),
+        		packageName + "." + simpleName,  packageName, simpleName, false, false);
+        
+		EntityType newType = new EntityType(classTypeModel);
+		
+		newType.getData().put("schema", type.getData().get("schema"));
+		newType.getData().put("table", type.getData().get("table"));
+        
+        for (Property property : type.getProperties()) {
+        	newType.addProperty(property);
+        }
+        
+        if (beanSerializer == null) {
+            typeMappings.register(newType, newType);
+        } else {
+        	Type mappedType = queryTypeFactory.create(newType);
+        
+        	entityToWrapped.put(newType, mappedType);
+            typeMappings.register(newType, mappedType);
+        }
+        
+        return newType;
+    }
 
-    private void serialize(EntityType type) {
+    private void serialize(EntityType type, List<EntityType> tableClasses, Connection conn) {
         try {
             String fileSuffix = createScalaSources ? ".scala" : ".java";
             String packageSuffix = "";
         	
-        	if (! type.isBaseTable()) {
+        	if (type.isBaseTable()) {
         		
-        		Type oldSimpleType = type.getInnerType();
-        		String packageName = oldSimpleType.getPackageName() + ".impl";
-        		String simpleName = oldSimpleType.getSimpleName();
-        		String beanSuffix = module.getBeanSuffix();
-        		
-        		if (beanSuffix != null && beanSuffix.length() > 0) {
-        			simpleName = simpleName.substring(0, simpleName.length() - beanSuffix.length()) +
-        				"Impl" + beanSuffix;
-        		} else {
-        			simpleName += "Impl";
-        		}
-        		
-                Type classTypeModel = new SimpleType(oldSimpleType.getCategory(),
-                		packageName + "." + simpleName,  packageName, simpleName, false, false);
-                
-        		EntityType newType = new EntityType(classTypeModel);
-        		
-        		newType.getData().put("schema", type.getData().get("schema"));
-        		newType.getData().put("table", type.getData().get("table"));
+        		String tableName = (String)type.getData().get("table");
+        		List<String> keyFields =
+        			multiValueColumn.baseTableKeyNames(conn, (String)type.getData().get("schema"), tableName);
+        		Set<Property> newProperties = new HashSet<Property>();
                 
                 for (Property property : type.getProperties()) {
-                	newType.addProperty(property);
+
+                	if (! property.isMultivalued()) {
+                		newProperties.add(property);
+                		continue;
+                	}
+                	
+                    ColumnMetadata metadata = (ColumnMetadata) property.getData().get("COLUMN");
+                    
+                	for (EntityType subType : tableClasses) {
+                		
+                		if (subType.isBaseTable() ||
+                			! multiValueColumn.isSubTable(tableName, metadata.getName(),
+                				(String)subType.getData().get("table"))) {
+                			continue;
+                		}
+                		
+                		subType = makeImplType(subType);
+                		
+                		for (Property subProperty : subType.getProperties()) {                			
+                			
+                            ColumnMetadata subMetadata = (ColumnMetadata) subProperty.getData().get("COLUMN");
+                            String subName = subMetadata.getName();
+                            boolean isKey = false;
+                            
+                            for (String key : keyFields) {
+                            	if (subName.equals(key)) {
+                            		isKey = true;
+                            		break;
+                            	}
+                            }
+                            
+                            if (isKey) {
+                            	continue;
+                            }                            
+                            
+                            Class<?> clazz = ((ClassType)subProperty.getType()).getJavaClass();
+                            Type typeModel = new ClassType(TypeCategory.LIST, List.class, subProperty.getType());
+                            Property newProperty = createProperty(property.getDeclaringType(), subProperty.getEscapedName(),
+                            		subProperty.getName(), typeModel,
+                            		typeMappings.getPathType(subType, subType, true));
+                            ColumnMetadata column = ColumnMetadata.named(subName).ofType(subMetadata.getJdbcType());
+
+                            column = column.withSize(subMetadata.getSize());
+                            column = column.withDigits(subMetadata.getDigits());
+                            column = column.withIndex(ColumnMetadata.UNDEFINED);
+                            
+                            newProperty.getData().put("COLUMN", column);
+
+                            if (columnAnnotations) {
+                            	newProperty.addAnnotation(new ColumnImpl(subProperty.getName()));
+                            }
+                            
+                            newProperties.add(newProperty);
+                		}
+                	}
                 }
                 
-                type = newType;
+                type.getProperties().clear();
+                type.getProperties().addAll(newProperties);
                 
-                if (beanSerializer == null) {
-                    typeMappings.register(type, type);
-                } else {
-                	Type mappedType = queryTypeFactory.create(type);
-                
-                	entityToWrapped.put(type, mappedType);
-                    typeMappings.register(type, mappedType);
-                }
+        	} else {
+        		
+        		type = makeImplType(type);
                 
                 packageSuffix = ".impl";
         	}

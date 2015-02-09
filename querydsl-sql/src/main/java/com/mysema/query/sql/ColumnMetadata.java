@@ -64,7 +64,7 @@ public final class ColumnMetadata implements Serializable {
         return new ColumnMetadata(null, name, null, true, UNDEFINED, UNDEFINED, null);
     }
 
-    private static final int UNDEFINED = -1;
+    public static final int UNDEFINED = -1;
 
     private final String name;
     
@@ -78,10 +78,10 @@ public final class ColumnMetadata implements Serializable {
 
     private final int decimalDigits;
     
-    private final RelationalPathBase<?> subQuery;
+    private final Class<? extends RelationalPathBase<?>> subQuery;
 
     private ColumnMetadata(Integer index, String name, Integer jdbcType, boolean nullable, int size,
-            int decimalDigits, RelationalPathBase<?> subQuery) {
+            int decimalDigits, Class<? extends RelationalPathBase<?>> subQuery) {
         this.index = index;
         this.name = name;
         this.jdbcType = jdbcType;
@@ -157,7 +157,7 @@ public final class ColumnMetadata implements Serializable {
         return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits, subQuery);
     }
     
-    public RelationalPathBase<?> getSubQuery() {
+    public Class<? extends RelationalPathBase<?>> getSubQuery() {
     	return subQuery;
     }
     
@@ -165,7 +165,7 @@ public final class ColumnMetadata implements Serializable {
     	return subQuery != null;
     }
     
-    public ColumnMetadata withSubQuery(RelationalPathBase<?> subQuery) {
+    public ColumnMetadata withSubQuery(Class<? extends RelationalPathBase<?>> subQuery) {
         return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits, subQuery);
 	}
 
@@ -190,6 +190,4 @@ public final class ColumnMetadata implements Serializable {
     public int hashCode() {
         return name.hashCode();
     }
-
-
 }

@@ -15,6 +15,7 @@
 package com.mysema.query.sql.codegen;
 
 import java.sql.Connection;
+import java.util.List;
 
 /**
  * @author Steve Pitschke
@@ -41,4 +42,27 @@ public interface MultiValueColumn {
 	 * @return <code>true</code> if table is a base table.
 	 */
 	boolean isBaseTable(Connection conn, String schema, String tableName);
+	
+	/**
+	 * Determine the list of keynames from the base table that should be removed from
+	 * the nested table columns
+	 * 
+	 * @param conn
+	 * @param schema
+	 * @param tableName
+	 * @return list of base table key names
+	 */
+	List<String> baseTableKeyNames(Connection conn, String schema, String tableName);
+	
+	/**
+	 * Determine if candidate sub-table is the one corresponding to multi-valued
+	 * column name
+	 * 
+	 * @param baseTable
+	 * @param columnName
+	 * @param subTable
+	 * @return <code>true</code> if sub-table is the sub-table for current multi-valued
+	 * column
+	 */
+	boolean isSubTable(String baseTable, String columnName, String subTable);
 }
