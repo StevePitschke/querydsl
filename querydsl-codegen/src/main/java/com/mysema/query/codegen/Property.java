@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ public final class Property implements Comparable<Property> {
     private final Map<Object, Object> data = new HashMap<Object,Object>();
 
     private final Type type;
+    
+    private final Class<?> subQuery;
 
     public Property(EntityType declaringType, String name, Type type) {
         this(declaringType, name, type, Collections.<String>emptyList(), false);
@@ -57,12 +59,18 @@ public final class Property implements Comparable<Property> {
 
     public Property(EntityType declaringType, String name, String escapedName, Type type,
             List<String> inits, boolean inherited) {
+        this(declaringType, name, escapedName, type, inits, inherited, null);
+    }
+
+    public Property(EntityType declaringType, String name, String escapedName, Type type,
+            List<String> inits, boolean inherited, Class<?> subQuery) {
         this.declaringType = declaringType;
         this.name = name;
         this.escapedName = escapedName;
         this.type = type;
         this.inits = inits;
         this.inherited = inherited;
+        this.subQuery = subQuery;
     }
 
     public void addAnnotation(Annotation annotation) {
@@ -150,7 +158,15 @@ public final class Property implements Comparable<Property> {
         return inherited;
     }
 
-    @Override
+    public Class<?> getSubQuery() {
+		return subQuery;
+	}
+    
+    public boolean isMultivalued() {
+    	return getSubQuery() != null;
+    }
+
+	@Override
     public String toString() {
         return declaringType.getFullName() + "." + name;
     }

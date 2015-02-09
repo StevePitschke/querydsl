@@ -50,7 +50,7 @@ public class DoQueryActs {
         	.outerJoin(actsAnimal).on(acts.actNo.eq(actsAnimal.actNo))
         	.join(livestock).on(actsAnimal.animalId.eq(livestock.animalId))
             .where(acts.description.like("%the%"))
-            .list(acts.actNo, acts.animalId, acts.description, livestock.description);
+            .list(acts.actNo, acts.description, livestock.description);
         
         for (Tuple row : results) {
         	System.out.println(row.get(acts.actNo) + "\t" + row.get(acts.description) + "\t" + row.get(livestock.description));

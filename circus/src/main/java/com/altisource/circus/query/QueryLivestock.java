@@ -42,14 +42,6 @@ public class QueryLivestock extends com.mysema.query.sql.RelationalPathBase<Live
 
     public final StringPath use = createString("use");
 
-    public final StringPath vacCert = createString("vacCert");
-
-    public final DatePath<java.sql.Date> vacDate = createDate("vacDate", java.sql.Date.class);
-
-    public final DatePath<java.sql.Date> vacNext = createDate("vacNext", java.sql.Date.class);
-
-    public final StringPath vacType = createString("vacType");
-
     public final com.mysema.query.sql.PrimaryKey<LivestockEntity> animalIdPk = createPrimaryKey(animalId);
 
     public QueryLivestock(String variable) {
@@ -81,10 +73,6 @@ public class QueryLivestock extends com.mysema.query.sql.RelationalPathBase<Live
         addMetadata(name, ColumnMetadata.named("NAME").withIndex(2).ofType(Types.VARCHAR).withSize(254));
         addMetadata(origin, ColumnMetadata.named("ORIGIN").withIndex(6).ofType(Types.VARCHAR).withSize(254));
         addMetadata(use, ColumnMetadata.named("USE").withIndex(4).ofType(Types.CHAR).withSize(1));
-        addMetadata(vacCert, ColumnMetadata.named("VAC_CERT").withIndex(12).ofType(Types.VARCHAR).withSize(254));
-        addMetadata(vacDate, ColumnMetadata.named("VAC_DATE").withIndex(10).ofType(Types.DATE).withSize(10));
-        addMetadata(vacNext, ColumnMetadata.named("VAC_NEXT").withIndex(11).ofType(Types.DATE).withSize(10));
-        addMetadata(vacType, ColumnMetadata.named("VAC_TYPE").withIndex(9).ofType(Types.CHAR).withSize(1).notNull());
     }
 
 }

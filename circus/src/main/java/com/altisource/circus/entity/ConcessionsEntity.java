@@ -1,5 +1,6 @@
 package com.altisource.circus.entity;
 
+import java.util.List;
 import javax.annotation.Generated;
 
 /**
@@ -12,13 +13,9 @@ public class ConcessionsEntity {
 
     private String description;
 
-    private Integer equipCode;
+    private List<Integer> equipCode;
 
-    private Integer itemCode;
-
-    private Integer operator;
-
-    private Integer qty;
+    private List<Integer> operator;
 
     public Integer getConcNo() {
         return concNo;
@@ -36,36 +33,20 @@ public class ConcessionsEntity {
         this.description = description;
     }
 
-    public Integer getEquipCode() {
+    public List<Integer> getEquipCode() {
         return equipCode;
     }
 
-    public void setEquipCode(Integer equipCode) {
+    public void setEquipCode(List<Integer> equipCode) {
         this.equipCode = equipCode;
     }
 
-    public Integer getItemCode() {
-        return itemCode;
-    }
-
-    public void setItemCode(Integer itemCode) {
-        this.itemCode = itemCode;
-    }
-
-    public Integer getOperator() {
+    public List<Integer> getOperator() {
         return operator;
     }
 
-    public void setOperator(Integer operator) {
+    public void setOperator(List<Integer> operator) {
         this.operator = operator;
-    }
-
-    public Integer getQty() {
-        return qty;
-    }
-
-    public void setQty(Integer qty) {
-        this.qty = qty;
     }
 
 }

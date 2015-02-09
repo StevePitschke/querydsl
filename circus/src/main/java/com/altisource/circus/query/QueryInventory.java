@@ -34,13 +34,9 @@ public class QueryInventory extends com.mysema.query.sql.RelationalPathBase<Inve
 
     public final StringPath itemType = createString("itemType");
 
-    public final NumberPath<Integer> orderQty = createNumber("orderQty", Integer.class);
-
     public final NumberPath<Double> price = createNumber("price", Double.class);
 
     public final NumberPath<Integer> qoh = createNumber("qoh", Integer.class);
-
-    public final NumberPath<Integer> vendorCode = createNumber("vendorCode", Integer.class);
 
     public final com.mysema.query.sql.PrimaryKey<InventoryEntity> itemCodePk = createPrimaryKey(itemCode);
 
@@ -69,10 +65,8 @@ public class QueryInventory extends com.mysema.query.sql.RelationalPathBase<Inve
         addMetadata(description, ColumnMetadata.named("DESCRIPTION").withIndex(3).ofType(Types.VARCHAR).withSize(254));
         addMetadata(itemCode, ColumnMetadata.named("ITEM_CODE").withIndex(1).ofType(Types.INTEGER).withSize(10).notNull());
         addMetadata(itemType, ColumnMetadata.named("ITEM_TYPE").withIndex(2).ofType(Types.CHAR).withSize(1));
-        addMetadata(orderQty, ColumnMetadata.named("ORDER_QTY").withIndex(8).ofType(Types.INTEGER).withSize(10));
         addMetadata(price, ColumnMetadata.named("PRICE").withIndex(6).ofType(Types.DECIMAL).withSize(10).withDigits(2));
         addMetadata(qoh, ColumnMetadata.named("QOH").withIndex(4).ofType(Types.INTEGER).withSize(10));
-        addMetadata(vendorCode, ColumnMetadata.named("VENDOR_CODE").withIndex(7).ofType(Types.INTEGER).withSize(10).notNull());
     }
 
 }

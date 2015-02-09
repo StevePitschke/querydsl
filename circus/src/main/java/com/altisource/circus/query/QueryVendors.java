@@ -9,9 +9,12 @@ import com.mysema.query.types.path.*;
 import com.mysema.query.types.PathMetadata;
 import javax.annotation.Generated;
 import com.mysema.query.types.Path;
+import com.mysema.query.types.path.PathInits;
 
 import com.mysema.query.sql.ColumnMetadata;
 import java.sql.Types;
+
+import com.altisource.circus.query.impl.QueryVendorsEquipCodeImpl;
 
 
 
@@ -36,13 +39,9 @@ public class QueryVendors extends com.mysema.query.sql.RelationalPathBase<Vendor
 
     public final StringPath contact = createString("contact");
 
-    public final NumberPath<Integer> equipCode = createNumber("equipCode", Integer.class);
+    public final ListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final StringPath fax = createString("fax");
-
-    public final NumberPath<Integer> itemCode = createNumber("itemCode", Integer.class);
-
-    public final NumberPath<Integer> leadTime = createNumber("leadTime", Integer.class);
 
     public final StringPath phone = createString("phone");
 
@@ -78,10 +77,8 @@ public class QueryVendors extends com.mysema.query.sql.RelationalPathBase<Vendor
         addMetadata(adr3, ColumnMetadata.named("ADR3").withIndex(5).ofType(Types.VARCHAR).withSize(254));
         addMetadata(company, ColumnMetadata.named("COMPANY").withIndex(2).ofType(Types.VARCHAR).withSize(254));
         addMetadata(contact, ColumnMetadata.named("CONTACT").withIndex(7).ofType(Types.VARCHAR).withSize(254));
-        addMetadata(equipCode, ColumnMetadata.named("EQUIP_CODE").withIndex(10).ofType(Types.INTEGER).withSize(10));
+        addMetadata(equipCode, ColumnMetadata.named("EQUIP_CODE").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryVendorsEquipCodeImpl.class));
         addMetadata(fax, ColumnMetadata.named("FAX").withIndex(9).ofType(Types.VARCHAR).withSize(254));
-        addMetadata(itemCode, ColumnMetadata.named("ITEM_CODE").withIndex(11).ofType(Types.INTEGER).withSize(10).notNull());
-        addMetadata(leadTime, ColumnMetadata.named("LEAD_TIME").withIndex(12).ofType(Types.INTEGER).withSize(10));
         addMetadata(phone, ColumnMetadata.named("PHONE").withIndex(8).ofType(Types.VARCHAR).withSize(254));
         addMetadata(terms, ColumnMetadata.named("TERMS").withIndex(6).ofType(Types.VARCHAR).withSize(254));
         addMetadata(vendorCode, ColumnMetadata.named("VENDOR_CODE").withIndex(1).ofType(Types.INTEGER).withSize(10).notNull());

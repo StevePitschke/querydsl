@@ -1,5 +1,6 @@
 package com.altisource.circus.entity;
 
+import java.util.List;
 import javax.annotation.Generated;
 
 /**
@@ -10,15 +11,15 @@ public class ActsEntity {
 
     private Integer actNo;
 
-    private Integer animalId;
+    private List<Integer> animalId;
 
     private String description;
 
     private Integer duration;
 
-    private Integer equipCode;
+    private List<Integer> equipCode;
 
-    private Integer operator;
+    private List<Integer> operator;
 
     public Integer getActNo() {
         return actNo;
@@ -28,11 +29,11 @@ public class ActsEntity {
         this.actNo = actNo;
     }
 
-    public Integer getAnimalId() {
+    public List<Integer> getAnimalId() {
         return animalId;
     }
 
-    public void setAnimalId(Integer animalId) {
+    public void setAnimalId(List<Integer> animalId) {
         this.animalId = animalId;
     }
 
@@ -52,19 +53,19 @@ public class ActsEntity {
         this.duration = duration;
     }
 
-    public Integer getEquipCode() {
+    public List<Integer> getEquipCode() {
         return equipCode;
     }
 
-    public void setEquipCode(Integer equipCode) {
+    public void setEquipCode(List<Integer> equipCode) {
         this.equipCode = equipCode;
     }
 
-    public Integer getOperator() {
+    public List<Integer> getOperator() {
         return operator;
     }
 
-    public void setOperator(Integer operator) {
+    public void setOperator(List<Integer> operator) {
         this.operator = operator;
     }
 

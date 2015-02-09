@@ -24,14 +24,6 @@ public class LivestockEntity {
 
     private String use;
 
-    private String vacCert;
-
-    private java.sql.Date vacDate;
-
-    private java.sql.Date vacNext;
-
-    private String vacType;
-
     public Integer getAnimalId() {
         return animalId;
     }
@@ -94,38 +86,6 @@ public class LivestockEntity {
 
     public void setUse(String use) {
         this.use = use;
-    }
-
-    public String getVacCert() {
-        return vacCert;
-    }
-
-    public void setVacCert(String vacCert) {
-        this.vacCert = vacCert;
-    }
-
-    public java.sql.Date getVacDate() {
-        return vacDate;
-    }
-
-    public void setVacDate(java.sql.Date vacDate) {
-        this.vacDate = vacDate;
-    }
-
-    public java.sql.Date getVacNext() {
-        return vacNext;
-    }
-
-    public void setVacNext(java.sql.Date vacNext) {
-        this.vacNext = vacNext;
-    }
-
-    public String getVacType() {
-        return vacType;
-    }
-
-    public void setVacType(String vacType) {
-        this.vacType = vacType;
     }
 
 }

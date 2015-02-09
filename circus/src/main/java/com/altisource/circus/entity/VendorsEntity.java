@@ -1,5 +1,6 @@
 package com.altisource.circus.entity;
 
+import java.util.List;
 import javax.annotation.Generated;
 
 /**
@@ -18,13 +19,9 @@ public class VendorsEntity {
 
     private String contact;
 
-    private Integer equipCode;
+    private List<Integer> equipCode;
 
     private String fax;
-
-    private Integer itemCode;
-
-    private Integer leadTime;
 
     private String phone;
 
@@ -72,11 +69,11 @@ public class VendorsEntity {
         this.contact = contact;
     }
 
-    public Integer getEquipCode() {
+    public List<Integer> getEquipCode() {
         return equipCode;
     }
 
-    public void setEquipCode(Integer equipCode) {
+    public void setEquipCode(List<Integer> equipCode) {
         this.equipCode = equipCode;
     }
 
@@ -86,22 +83,6 @@ public class VendorsEntity {
 
     public void setFax(String fax) {
         this.fax = fax;
-    }
-
-    public Integer getItemCode() {
-        return itemCode;
-    }
-
-    public void setItemCode(Integer itemCode) {
-        this.itemCode = itemCode;
-    }
-
-    public Integer getLeadTime() {
-        return leadTime;
-    }
-
-    public void setLeadTime(Integer leadTime) {
-        this.leadTime = leadTime;
     }
 
     public String getPhone() {

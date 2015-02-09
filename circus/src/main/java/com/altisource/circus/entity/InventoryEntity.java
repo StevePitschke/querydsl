@@ -16,13 +16,9 @@ public class InventoryEntity {
 
     private String itemType;
 
-    private Integer orderQty;
-
     private Double price;
 
     private Integer qoh;
-
-    private Integer vendorCode;
 
     public Double getCost() {
         return cost;
@@ -56,14 +52,6 @@ public class InventoryEntity {
         this.itemType = itemType;
     }
 
-    public Integer getOrderQty() {
-        return orderQty;
-    }
-
-    public void setOrderQty(Integer orderQty) {
-        this.orderQty = orderQty;
-    }
-
     public Double getPrice() {
         return price;
     }
@@ -78,14 +66,6 @@ public class InventoryEntity {
 
     public void setQoh(Integer qoh) {
         this.qoh = qoh;
-    }
-
-    public Integer getVendorCode() {
-        return vendorCode;
-    }
-
-    public void setVendorCode(Integer vendorCode) {
-        this.vendorCode = vendorCode;
     }
 
 }

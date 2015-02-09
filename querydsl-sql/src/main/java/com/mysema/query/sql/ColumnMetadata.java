@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Mysema Ltd
+ * Copyright 2013-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public final class ColumnMetadata implements Serializable {
      *             if the name is null
      */
     public static ColumnMetadata named(String name) {
-        return new ColumnMetadata(null, name, null, true, UNDEFINED, UNDEFINED);
+        return new ColumnMetadata(null, name, null, true, UNDEFINED, UNDEFINED, null);
     }
 
     private static final int UNDEFINED = -1;
@@ -77,15 +77,18 @@ public final class ColumnMetadata implements Serializable {
     private final int size;
 
     private final int decimalDigits;
+    
+    private final RelationalPathBase<?> subQuery;
 
     private ColumnMetadata(Integer index, String name, Integer jdbcType, boolean nullable, int size,
-            int decimalDigits) {
+            int decimalDigits, RelationalPathBase<?> subQuery) {
         this.index = index;
         this.name = name;
         this.jdbcType = jdbcType;
         this.nullable = nullable;
         this.size = size;
         this.decimalDigits = decimalDigits;
+        this.subQuery = subQuery;
     }
 
     public String getName() {
@@ -97,7 +100,7 @@ public final class ColumnMetadata implements Serializable {
     }
     
     public ColumnMetadata withIndex(int index) {
-        return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits);
+        return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits, subQuery);
     }
 
     public int getJdbcType() {
@@ -109,7 +112,7 @@ public final class ColumnMetadata implements Serializable {
     }
 
     public ColumnMetadata ofType(int jdbcType) {
-        return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits);
+        return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits, subQuery);
     }
 
     public boolean isNullable() {
@@ -117,7 +120,7 @@ public final class ColumnMetadata implements Serializable {
     }
 
     public ColumnMetadata notNull() {
-        return new ColumnMetadata(index, name, jdbcType, false, size, decimalDigits);
+        return new ColumnMetadata(index, name, jdbcType, false, size, decimalDigits, subQuery);
     }
 
     /**
@@ -134,7 +137,7 @@ public final class ColumnMetadata implements Serializable {
     }
 
     public ColumnMetadata withSize(int size) {
-        return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits);
+        return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits, subQuery);
     }
 
     /**
@@ -151,8 +154,20 @@ public final class ColumnMetadata implements Serializable {
     }
 
     public ColumnMetadata withDigits(int decimalDigits) {
-        return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits);
+        return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits, subQuery);
     }
+    
+    public RelationalPathBase<?> getSubQuery() {
+    	return subQuery;
+    }
+    
+    public boolean isMultiValued() {
+    	return subQuery != null;
+    }
+    
+    public ColumnMetadata withSubQuery(RelationalPathBase<?> subQuery) {
+        return new ColumnMetadata(index, name, jdbcType, nullable, size, decimalDigits, subQuery);
+	}
 
     @Override
     public boolean equals(Object o) {
@@ -164,7 +179,8 @@ public final class ColumnMetadata implements Serializable {
                 && Objects.equal(jdbcType, md.jdbcType)
                 && nullable == md.nullable
                 && size == md.size
-                && decimalDigits == md.decimalDigits;
+                && decimalDigits == md.decimalDigits
+                && subQuery == md.subQuery;
         } else {
             return false;
         }
