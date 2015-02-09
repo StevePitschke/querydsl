@@ -18,6 +18,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Steve Pitschke
@@ -67,5 +69,44 @@ public class UniVerseMultiValueColumn implements MultiValueColumn {
 		}
 		
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.sql.codegen.MultiValueColumn#baseTableKeyNames(java.sql.Connection, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public List<String> baseTableKeyNames(Connection conn, String schema,
+			String tableName) {
+
+		List<String> results = new ArrayList<String>();
+		
+		results.add("@ASSOC_ROW"); // Not exactly a key, but should be removed from nested tables;
+		
+		try {
+			
+			Statement stmt = conn.createStatement();
+	        ResultSet resultSet = stmt.executeQuery("SELECT COLUMN_NAME FROM UV_COLUMNS WHERE TABLE_SCHEMA='" + schema +
+	        		"' AND TABLE_NAME='" + tableName + "' AND KEY_SEQ>0");
+	        
+	        while (resultSet.next()) {
+	        	results.add(resultSet.getString("COLUMN_NAME"));
+	        }
+	        
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return results;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.sql.codegen.MultiValueColumn#isSubTable(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean isSubTable(String baseTable, String columnName,
+			String subTable) {
+		
+		return subTable.equals(baseTable + "_" + columnName);
 	}
 }

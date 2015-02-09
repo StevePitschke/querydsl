@@ -192,6 +192,11 @@
       <version>1.2</version>
       <optional>true</optional>
     </dependency>
+    <dependency>
+    	<groupId>com.mysema.querydsl</groupId>
+    	<artifactId>querydsl-codegen</artifactId>
+    	<version>${project.version}</version>
+    </dependency>
   </dependencies>
   
   <build>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ package com.mysema.query.sql.codegen;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -33,6 +34,7 @@ import com.mysema.query.sql.support.ForeignKeyData;
 import com.mysema.query.sql.support.InverseForeignKeyData;
 import com.mysema.query.sql.support.KeyData;
 import com.mysema.query.sql.support.PrimaryKeyData;
+
 import static com.mysema.codegen.Symbols.*;
 
 /**
@@ -168,9 +170,11 @@ public class MetaDataSerializer extends EntitySerializer {
     protected void introImports(CodeWriter writer, SerializerConfig config, EntityType model) throws IOException {
         super.introImports(writer, config, model);
 
-        Collection<ForeignKeyData> foreignKeys = (Collection<ForeignKeyData>)
+        @SuppressWarnings("unchecked")
+		Collection<ForeignKeyData> foreignKeys = (Collection<ForeignKeyData>)
                 model.getData().get(ForeignKeyData.class);
-        Collection<InverseForeignKeyData> inverseForeignKeys = (Collection<InverseForeignKeyData>)
+        @SuppressWarnings("unchecked")
+		Collection<InverseForeignKeyData> inverseForeignKeys = (Collection<InverseForeignKeyData>)
                 model.getData().get(InverseForeignKeyData.class);
         boolean addJavaUtilImport = false;
         if (foreignKeys != null) {
@@ -196,6 +200,15 @@ public class MetaDataSerializer extends EntitySerializer {
 
         if (!entityPathType.getPackage().equals(ColumnMetadata.class.getPackage())) {
             writer.imports(entityPathType);
+        }
+        
+        Set<Type> multiValueClasses = new HashSet<Type>();
+        
+        for (Property property : model.getProperties()) {
+        	if (property.isMultivalued() && ! multiValueClasses.contains(property.getSubQuery())) {
+        		writer.importClasses(property.getSubQuery().getFullName());
+        		multiValueClasses.add(property.getSubQuery());
+        	}
         }
 
         writeUserImports(writer);
@@ -247,6 +260,9 @@ public class MetaDataSerializer extends EntitySerializer {
             }
             if (!metadata.isNullable()) {
                 columnMeta.append(".notNull()");
+            }
+            if (property.isMultivalued()) {
+            	columnMeta.append(".withSubQuery(" + property.getSubQuery().getSimpleName() + ".class)");
             }
             writer.line("addMetadata(", name, ", ", columnMeta.toString(), ");");
         }

@@ -15,6 +15,8 @@
 package com.mysema.query.sql.codegen;
 
 import java.sql.Connection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Steve Pitschke
@@ -35,5 +37,24 @@ public class DefaultMultiValueColumn implements MultiValueColumn {
 	@Override
 	public boolean isBaseTable(Connection conn, String schema, String tableName) {
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.sql.codegen.MultiValueColumn#baseTableKeyNames(java.sql.Connection, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public List<String> baseTableKeyNames(Connection conn, String schema,
+			String tableName) {
+		return Collections.emptyList();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.sql.codegen.MultiValueColumn#isSubTable(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public boolean isSubTable(String baseTable, String columnName,
+			String subTable) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
