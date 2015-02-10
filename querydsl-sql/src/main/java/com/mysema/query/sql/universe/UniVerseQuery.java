@@ -13,7 +13,6 @@
  */
 package com.mysema.query.sql.universe;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import com.mysema.query.sql.SQLQuery;
 import com.mysema.query.sql.SQLTemplates;
 import com.mysema.query.sql.UniVerseTemplates;
 import com.mysema.query.types.Expression;
+import com.mysema.query.types.FactoryExpression;
 import com.mysema.query.types.MapExpression;
 import com.mysema.query.types.OperationImpl;
 import com.mysema.query.types.Ops;
@@ -42,6 +42,7 @@ import com.mysema.query.types.Path;
 import com.mysema.query.types.QTuple;
 import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.expr.ComparableExpressionBase;
+import com.mysema.query.types.expr.Wildcard;
 import com.mysema.query.types.path.ListPath;
 import com.mysema.query.types.path.NumberPath;
 import com.mysema.query.types.path.StringPath;
@@ -58,6 +59,7 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
     private static final String WHEN = "\nwhen ";
     
     private final Connection conn;
+    private boolean recursedThruList = false;
 
     public UniVerseQuery(Connection conn) {
         this(conn, new Configuration(new UniVerseTemplates()), new DefaultQueryMetadata());
@@ -170,7 +172,12 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 			}
 		}
 		
+		recursedThruList = true;
+		
 		List<Tuple> results = super.list(newArgs.toArray(new Expression<?>[newArgs.size()]));
+		
+		recursedThruList = false;
+		
 		List<Expression<?>> qlist = new ArrayList<Expression<?>>();
 		
 		for (Expression<?> expr : newArgs) {
@@ -180,7 +187,9 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		QTuple qtuple = null;
 		int sequence = 0;
 		int rowCount = 0;
+		
 		List<RelationalPathBase<?>> subQueryObjects = new ArrayList<RelationalPathBase<?>>();
+		
 		List<List<Path<?>>> selectFieldLists = new ArrayList<List<Path<?>>>();
 		
 		for (Tuple row : results) {
@@ -299,6 +308,63 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		}
 		
 		return results;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <RT> List<RT> list(Expression<RT> expr) {
+		
+		if (recursedThruList) {
+			return super.list(expr);
+		}
+		
+		List<JoinExpression> joins = getMetadata().getJoins();
+		
+		if (joins.size() > 1) {
+			return super.list(expr);
+		}
+		
+		RelationalPathBase<?> queryObj = (RelationalPathBase<?>)joins.get(0).getTarget();
+		boolean hasMultiValuedColumns = false;
+		
+		for (Path<?> column : queryObj.getColumns()) {
+			if (queryObj.getMetadata(column).isMultiValued()) {
+				hasMultiValuedColumns = true;
+				break;
+			}
+		}
+		
+		if (! hasMultiValuedColumns) {
+			return super.list(expr);
+		}
+		
+		Expression<RT> tranformedExpr = queryMixin.addProjection(expr);
+        final List<RT> rv = new ArrayList<RT>();
+    	List<Path<?>> columns = queryObj.getColumns();
+    	Object[] row = new Object[columns.size()];
+    	 		
+        if (tranformedExpr instanceof FactoryExpression) {
+        	
+    		recursedThruList = true;
+    		
+        	List<Tuple> tuples = list(columns.toArray(new Path<?>[columns.size()]));
+        	
+    		recursedThruList = false;
+    		
+        	for (Tuple tuple : tuples) {
+        		
+        		for (int idx = 0; idx < columns.size(); idx++) {
+        			row[idx] = tuple.get(columns.get(idx));
+        		}
+        		
+        		rv.add(((FactoryExpression<RT>)tranformedExpr).newInstance(row));
+        	}
+        	
+        } else {
+        	throw new IllegalStateException("Not sure what to do with this: " + expr);
+        }
+        
+        return rv;
 	}
 
 	@Override
