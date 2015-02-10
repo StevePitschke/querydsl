@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.List;
 
+import com.altisource.circus.entity.InventoryEntity;
 import com.altisource.circus.query.QueryActs;
 import com.altisource.circus.query.QueryInventory;
 import com.altisource.circus.query.QueryLivestock;
@@ -82,6 +83,18 @@ public class DoQueryActs {
         						"\t" + row.get(inventory.vendorCode));
         }            
         
-        conn.close();
+        System.out.println();
+        
+        inventory = new QueryInventory("d"); 
+        query = new UniVerseQuery(conn, dialect); 
+        List<InventoryEntity> records = query.from(inventory)
+            .list(inventory.getProjection());
+        
+        for (InventoryEntity record : records) {
+        	System.out.println(record.getCost() + "\t" + record.getDescription() + "\t" + record.getOrderQty() +
+        						"\t" + record.getVendorCode());
+        }            
+        
+       conn.close();
     }
 }
