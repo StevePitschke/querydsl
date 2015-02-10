@@ -13,11 +13,14 @@
  */
 package com.mysema.query.sql.universe;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.mysema.query.DefaultQueryMetadata;
 import com.mysema.query.JoinExpression;
@@ -26,7 +29,6 @@ import com.mysema.query.QueryFlag.Position;
 import com.mysema.query.QueryMetadata;
 import com.mysema.query.Tuple;
 import com.mysema.query.sql.AbstractSQLQuery;
-import com.mysema.query.sql.ColumnMetadata;
 import com.mysema.query.sql.Configuration;
 import com.mysema.query.sql.RelationalPathBase;
 import com.mysema.query.sql.SQLQuery;
@@ -124,11 +126,23 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		}
 		
 		List<Expression<?>> newArgs = new ArrayList<Expression<?>>();
-		List<ListPath<?,?>> listArgs = new ArrayList<ListPath<?,?>>();
+		Map<Class<? extends RelationalPathBase<?>>, List<ListPath<?,?>>> listArgs =
+			new HashMap<Class<? extends RelationalPathBase<?>>, List<ListPath<?,?>>>();
+		RelationalPathBase<?> queryObj = (RelationalPathBase<?>)joins.get(0).getTarget();
 		
 		for (Expression<?> expr : args) {
-			if (expr instanceof ListPath<?, ?>) {
-				listArgs.add((ListPath<?,?>)expr);
+			if (expr instanceof ListPath<?, ?> && queryObj.getMetadata((ListPath<?, ?>)expr).isMultiValued()) {
+				
+				Class<? extends RelationalPathBase<?>> subQuery = queryObj.getMetadata((ListPath<?, ?>)expr).getSubQuery();
+				List<ListPath<?,?>> list = listArgs.get(subQuery);
+				
+				if (list == null) {
+					list = new ArrayList<ListPath<?,?>>();
+					listArgs.put(subQuery, list);
+				}
+				
+				list.add((ListPath<?,?>)expr);
+				
 			} else {
 				newArgs.add(expr);
 			}
@@ -138,7 +152,6 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 			return super.list(args);
 		}
 		
-		RelationalPathBase<?> queryObj = (RelationalPathBase<?>)joins.get(0).getTarget();
 		List<ComparableExpressionBase<?>> keys = queryObj.getKeyVariables();
 		
 		for (ComparableExpressionBase<?> key : keys) {
@@ -180,13 +193,12 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 			
 			int fieldCount = 0;
 			
-			for (ListPath<?,?> multiValuedField : listArgs) {
+			for (Class<? extends RelationalPathBase<?>> subQueryClass : listArgs.keySet()) {
 				
-				ColumnMetadata colMeta = queryObj.getMetadata(multiValuedField);
 				RelationalPathBase<?> subQueryObj;
 				try {
 					if (rowCount == 0) {
-						subQueryObj = colMeta.getSubQuery().getConstructor(String.class).newInstance("SUB_QUERY_" + sequence++);
+						subQueryObj = subQueryClass.getConstructor(String.class).newInstance("SUB_QUERY_" + sequence++);
 						subQueryObjects.add(subQueryObj);
 					} else {
 						subQueryObj = subQueryObjects.get(fieldCount);
@@ -195,6 +207,7 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 					// XXX - can't happen.
 					throw new IllegalStateException(e);
 				}
+				
 				BooleanExpression where = null;
 				
 				for (ComparableExpressionBase<?> key : keys) {
@@ -236,31 +249,35 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 				
 					selectFields = new ArrayList<Path<?>>();
 					
-					for (Path<?> column : subQueryObj.getColumns()) {
-						
-						String colName = column.getMetadata().getName();
-						
-						if (colName.equals(multiValuedField.getMetadata().getName())) {
+					for (ListPath<?,?> multiValuedField : listArgs.get(subQueryClass)) {
+					
+						for (Path<?> column : subQueryObj.getColumns()) {
 							
-							selectFields.add(column);
+							String colName = column.getMetadata().getName();
 							
-							if (rowCount == 0) {
-								qlist.add(multiValuedField);
+							if (colName.equals(multiValuedField.getMetadata().getName())) {
+								
+								selectFields.add(column);
+								
+								if (rowCount == 0) {
+									qlist.add(multiValuedField);
+								}
+								
+								break;
 							}
-							
-							break;
 						}
 					}
-						
+					
 					selectFieldLists.add(selectFields);
 				}
-				
+					
 				selectFields = selectFieldLists.get(fieldCount++);
 					
-		        UniVerseQuery query = new UniVerseQuery(conn); 
-		        List<Tuple> subResults = query.from(subQueryObj)
-		            .where(where)
-		            .list(selectFields.toArray(new Path<?>[selectFields.size()]));
+		        UniVerseQuery query = new UniVerseQuery(conn)
+		        	.from(subQueryObj)
+		        	.where(where);
+		        List<Tuple> subResults = 
+		            query.list(selectFields.toArray(new Path<?>[selectFields.size()]));
 		        
 				for (Path<?> column : selectFields) {
 
