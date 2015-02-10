@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ package com.mysema.query.sql;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,9 +24,11 @@ import com.google.common.collect.Maps;
 import com.mysema.query.types.*;
 import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.expr.BooleanOperation;
+import com.mysema.query.types.expr.ComparableExpressionBase;
 import com.mysema.query.types.expr.NumberExpression;
 import com.mysema.query.types.expr.NumberOperation;
 import com.mysema.query.types.path.BeanPath;
+
 import static com.google.common.collect.ImmutableList.copyOf;
 
 /**
@@ -265,4 +268,8 @@ public class RelationalPathBase<T> extends BeanPath<T> implements RelationalPath
         return columnMetadata.get(column);
     }
 
+	@Override
+	public List<ComparableExpressionBase<?>> getKeyVariables() {
+		return Collections.emptyList();
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.List;
 import com.mysema.query.types.EntityPath;
 import com.mysema.query.types.Path;
 import com.mysema.query.types.ProjectionRole;
+import com.mysema.query.types.expr.ComparableExpressionBase;
 
 /**
  * RelationalPath extends {@link EntityPath} to provide access to relational
@@ -88,4 +89,10 @@ public interface RelationalPath<T> extends EntityPath<T>, ProjectionRole<T> {
     @Override
     @Nullable
     ColumnMetadata getMetadata(Path<?> column);
+    
+    /**
+     * @return the list of key variable paths.
+     * @return
+     */
+    List<ComparableExpressionBase<?>> getKeyVariables();
 }

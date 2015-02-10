@@ -101,11 +101,32 @@ public class UniVerseMultiValueColumn implements MultiValueColumn {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.mysema.query.sql.codegen.MultiValueColumn#isSubTable(java.lang.String, java.lang.String, java.lang.String)
+	 * @see com.mysema.query.sql.codegen.MultiValueColumn#isSubTable(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public boolean isSubTable(String baseTable, String columnName,
+	public boolean isSubTable(Connection conn, String schema, String baseTable, String columnName,
 			String subTable) {
+		
+		String association = null;
+		
+		try {
+			
+			Statement stmt = conn.createStatement();
+	        ResultSet results = stmt.executeQuery("SELECT IN_ASSOCIATION FROM UV_COLUMNS WHERE TABLE_SCHEMA='" + schema +
+	        		"' AND TABLE_NAME='" + baseTable + "' AND COLUMN_NAME='" + columnName + "'");
+	        
+	        while (results.next()) {	        	
+	        	association = results.getString("IN_ASSOCIATION");
+	        	break;
+	        }
+	        
+		} catch (SQLException e) {
+			// XXX - ignore
+		}
+		
+		if (association != null && association.length() > 0) {
+			columnName = association;
+		}
 		
 		return subTable.equals(baseTable + "_" + columnName);
 	}

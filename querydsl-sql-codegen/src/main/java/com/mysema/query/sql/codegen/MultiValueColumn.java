@@ -58,11 +58,13 @@ public interface MultiValueColumn {
 	 * Determine if candidate sub-table is the one corresponding to multi-valued
 	 * column name
 	 * 
+	 * @param conn
+	 * @param schema
 	 * @param baseTable
 	 * @param columnName
 	 * @param subTable
 	 * @return <code>true</code> if sub-table is the sub-table for current multi-valued
 	 * column
 	 */
-	boolean isSubTable(String baseTable, String columnName, String subTable);
+	boolean isSubTable(Connection conn, String schema, String baseTable, String columnName, String subTable);
 }

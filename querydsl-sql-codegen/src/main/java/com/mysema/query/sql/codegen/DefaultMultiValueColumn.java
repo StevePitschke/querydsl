@@ -49,10 +49,10 @@ public class DefaultMultiValueColumn implements MultiValueColumn {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.mysema.query.sql.codegen.MultiValueColumn#isSubTable(java.lang.String, java.lang.String, java.lang.String)
+	 * @see com.mysema.query.sql.codegen.MultiValueColumn#isSubTable(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public boolean isSubTable(String baseTable, String columnName,
+	public boolean isSubTable(Connection conn, String schema, String baseTable, String columnName,
 			String subTable) {
 		// TODO Auto-generated method stub
 		return false;

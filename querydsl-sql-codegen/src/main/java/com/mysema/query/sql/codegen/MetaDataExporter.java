@@ -422,26 +422,38 @@ public class MetaDataExporter {
             String fileSuffix = createScalaSources ? ".scala" : ".java";
             String packageSuffix = "";
         	
-        	if (type.isBaseTable()) {
+        	if (type.isBaseTable() && type.hasMultiValuedColumns()) {
         		
         		String tableName = (String)type.getData().get("table");
         		List<String> keyFields =
         			multiValueColumn.baseTableKeyNames(conn, (String)type.getData().get("schema"), tableName);
         		Set<Property> newProperties = new HashSet<Property>();
+        		List<String> keyVariables = new ArrayList<String>();
                 
                 for (Property property : type.getProperties()) {
 
+                    ColumnMetadata metadata = (ColumnMetadata) property.getData().get("COLUMN");
+                    
                 	if (! property.isMultivalued()) {
+                		
                 		newProperties.add(property);
+                		
+                        String subName = metadata.getName();
+                        
+                        for (String key : keyFields) {
+                        	if (subName.equals(key)) {
+                        		keyVariables.add(property.getName());
+                        		break;
+                        	}
+                        }
+                        
                 		continue;
                 	}
                 	
-                    ColumnMetadata metadata = (ColumnMetadata) property.getData().get("COLUMN");
-                    
                 	for (EntityType subType : tableClasses) {
                 		
                 		if (subType.isBaseTable() ||
-                			! multiValueColumn.isSubTable(tableName, metadata.getName(),
+                			! multiValueColumn.isSubTable(conn, (String)type.getData().get("schema"), tableName, metadata.getName(),
                 				(String)subType.getData().get("table"))) {
                 			continue;
                 		}
@@ -489,8 +501,9 @@ public class MetaDataExporter {
                 
                 type.getProperties().clear();
                 type.getProperties().addAll(newProperties);
+                type.setKeyVariables(keyVariables);
                 
-        	} else {
+        	} else if (! type.isBaseTable()) {
         		
         		type = makeImplType(type);
                 

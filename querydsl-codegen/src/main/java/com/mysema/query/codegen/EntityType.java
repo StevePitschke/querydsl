@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,8 @@ public class EntityType extends TypeAdapter implements Comparable<EntityType> {
     private boolean isBaseTable;
     
     private boolean hasMultiValuedColumns;
+    
+    private List<String> keyVariables;
     
     /**
      * Create a new EntityType instance for the given type
@@ -272,5 +274,13 @@ public class EntityType extends TypeAdapter implements Comparable<EntityType> {
 
 	public void setHasMultiValuedColumns(boolean hasMultiValuedColumns) {
 		this.hasMultiValuedColumns = hasMultiValuedColumns;
+	}
+
+	public List<String> getKeyVariables() {
+		return keyVariables;
+	}
+
+	public void setKeyVariables(List<String> keyVariables) {
+		this.keyVariables = keyVariables;
 	}
 }
