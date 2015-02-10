@@ -1,5 +1,6 @@
 package com.altisource.circus.entity;
 
+import java.util.List;
 import javax.annotation.Generated;
 
 /**
@@ -16,9 +17,13 @@ public class InventoryEntity {
 
     private String itemType;
 
+    private List<Integer> orderQty;
+
     private Double price;
 
     private Integer qoh;
+
+    private List<Integer> vendorCode;
 
     public Double getCost() {
         return cost;
@@ -52,6 +57,14 @@ public class InventoryEntity {
         this.itemType = itemType;
     }
 
+    public List<Integer> getOrderQty() {
+        return orderQty;
+    }
+
+    public void setOrderQty(List<Integer> orderQty) {
+        this.orderQty = orderQty;
+    }
+
     public Double getPrice() {
         return price;
     }
@@ -66,6 +79,14 @@ public class InventoryEntity {
 
     public void setQoh(Integer qoh) {
         this.qoh = qoh;
+    }
+
+    public List<Integer> getVendorCode() {
+        return vendorCode;
+    }
+
+    public void setVendorCode(List<Integer> vendorCode) {
+        this.vendorCode = vendorCode;
     }
 
 }

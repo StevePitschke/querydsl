@@ -1,5 +1,6 @@
 package com.altisource.circus.entity;
 
+import java.util.List;
 import javax.annotation.Generated;
 
 /**
@@ -23,6 +24,14 @@ public class LivestockEntity {
     private String origin;
 
     private String use;
+
+    private List<String> vacCert;
+
+    private List<java.sql.Date> vacDate;
+
+    private List<java.sql.Date> vacNext;
+
+    private List<String> vacType;
 
     public Integer getAnimalId() {
         return animalId;
@@ -86,6 +95,38 @@ public class LivestockEntity {
 
     public void setUse(String use) {
         this.use = use;
+    }
+
+    public List<String> getVacCert() {
+        return vacCert;
+    }
+
+    public void setVacCert(List<String> vacCert) {
+        this.vacCert = vacCert;
+    }
+
+    public List<java.sql.Date> getVacDate() {
+        return vacDate;
+    }
+
+    public void setVacDate(List<java.sql.Date> vacDate) {
+        this.vacDate = vacDate;
+    }
+
+    public List<java.sql.Date> getVacNext() {
+        return vacNext;
+    }
+
+    public void setVacNext(List<java.sql.Date> vacNext) {
+        this.vacNext = vacNext;
+    }
+
+    public List<String> getVacType() {
+        return vacType;
+    }
+
+    public void setVacType(List<String> vacType) {
+        this.vacType = vacType;
     }
 
 }

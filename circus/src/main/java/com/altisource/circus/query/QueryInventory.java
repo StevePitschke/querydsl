@@ -9,9 +9,16 @@ import com.mysema.query.types.path.*;
 import com.mysema.query.types.PathMetadata;
 import javax.annotation.Generated;
 import com.mysema.query.types.Path;
+import com.mysema.query.types.path.PathInits;
 
 import com.mysema.query.sql.ColumnMetadata;
 import java.sql.Types;
+
+import com.altisource.circus.query.impl.QueryInventoryOrdersAssocImpl;
+
+import java.util.List;
+import java.util.ArrayList;
+import com.mysema.query.types.expr.ComparableExpressionBase;
 
 
 
@@ -34,9 +41,13 @@ public class QueryInventory extends com.mysema.query.sql.RelationalPathBase<Inve
 
     public final StringPath itemType = createString("itemType");
 
+    public final ListPath<Integer, NumberPath<Integer>> orderQty = this.<Integer, NumberPath<Integer>>createList("orderQty", Integer.class, NumberPath.class, PathInits.DIRECT2);
+
     public final NumberPath<Double> price = createNumber("price", Double.class);
 
     public final NumberPath<Integer> qoh = createNumber("qoh", Integer.class);
+
+    public final ListPath<Integer, NumberPath<Integer>> vendorCode = this.<Integer, NumberPath<Integer>>createList("vendorCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final com.mysema.query.sql.PrimaryKey<InventoryEntity> itemCodePk = createPrimaryKey(itemCode);
 
@@ -65,8 +76,16 @@ public class QueryInventory extends com.mysema.query.sql.RelationalPathBase<Inve
         addMetadata(description, ColumnMetadata.named("DESCRIPTION").withIndex(3).ofType(Types.VARCHAR).withSize(254));
         addMetadata(itemCode, ColumnMetadata.named("ITEM_CODE").withIndex(1).ofType(Types.INTEGER).withSize(10).notNull());
         addMetadata(itemType, ColumnMetadata.named("ITEM_TYPE").withIndex(2).ofType(Types.CHAR).withSize(1));
+        addMetadata(orderQty, ColumnMetadata.named("ORDER_QTY").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryInventoryOrdersAssocImpl.class));
         addMetadata(price, ColumnMetadata.named("PRICE").withIndex(6).ofType(Types.DECIMAL).withSize(10).withDigits(2));
         addMetadata(qoh, ColumnMetadata.named("QOH").withIndex(4).ofType(Types.INTEGER).withSize(10));
+        addMetadata(vendorCode, ColumnMetadata.named("VENDOR_CODE").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryInventoryOrdersAssocImpl.class));
+    }
+
+    public List<ComparableExpressionBase<?>> getKeyVariables() {
+        List<ComparableExpressionBase<?>> results = new ArrayList<ComparableExpressionBase<?>>();
+        results.add(itemCode);
+        return results;
     }
 
 }

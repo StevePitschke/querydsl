@@ -18,6 +18,10 @@ import com.altisource.circus.query.impl.QueryRidesEquipCodeImpl;
 
 import com.altisource.circus.query.impl.QueryRidesOperatorImpl;
 
+import java.util.List;
+import java.util.ArrayList;
+import com.mysema.query.types.expr.ComparableExpressionBase;
+
 
 
 
@@ -66,6 +70,12 @@ public class QueryRides extends com.mysema.query.sql.RelationalPathBase<RidesEnt
         addMetadata(equipCode, ColumnMetadata.named("EQUIP_CODE").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryRidesEquipCodeImpl.class));
         addMetadata(operator, ColumnMetadata.named("OPERATOR").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryRidesOperatorImpl.class));
         addMetadata(rideId, ColumnMetadata.named("RIDE_ID").withIndex(1).ofType(Types.INTEGER).withSize(10).notNull());
+    }
+
+    public List<ComparableExpressionBase<?>> getKeyVariables() {
+        List<ComparableExpressionBase<?>> results = new ArrayList<ComparableExpressionBase<?>>();
+        results.add(rideId);
+        return results;
     }
 
 }

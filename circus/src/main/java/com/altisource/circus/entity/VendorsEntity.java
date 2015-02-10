@@ -23,6 +23,10 @@ public class VendorsEntity {
 
     private String fax;
 
+    private List<Integer> itemCode;
+
+    private List<Integer> leadTime;
+
     private String phone;
 
     private String terms;
@@ -83,6 +87,22 @@ public class VendorsEntity {
 
     public void setFax(String fax) {
         this.fax = fax;
+    }
+
+    public List<Integer> getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(List<Integer> itemCode) {
+        this.itemCode = itemCode;
+    }
+
+    public List<Integer> getLeadTime() {
+        return leadTime;
+    }
+
+    public void setLeadTime(List<Integer> leadTime) {
+        this.leadTime = leadTime;
     }
 
     public String getPhone() {

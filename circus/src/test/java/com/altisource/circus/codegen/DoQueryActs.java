@@ -56,6 +56,19 @@ public class DoQueryActs {
         	System.out.println(row.get(acts.actNo) + "\t" + row.get(acts.description) + "\t" + row.get(livestock.description));
         }
         
+        System.out.println();
+        
+        acts = new QueryActs("a"); 
+        query = new UniVerseQuery(conn, dialect); 
+        results = query.from(acts)
+            .where(acts.description.like("%the%"))
+            .list(acts.animalId, acts.description, acts.equipCode);
+        
+        for (Tuple row : results) {
+        	System.out.println(row.get(acts.actNo) + "\t" + row.get(acts.description) + "\t" + row.get(acts.animalId) +
+        						"\t" + row.get(acts.equipCode));
+        }            
+        
         conn.close();
     }
 }

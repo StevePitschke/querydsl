@@ -9,9 +9,16 @@ import com.mysema.query.types.path.*;
 import com.mysema.query.types.PathMetadata;
 import javax.annotation.Generated;
 import com.mysema.query.types.Path;
+import com.mysema.query.types.path.PathInits;
 
 import com.mysema.query.sql.ColumnMetadata;
 import java.sql.Types;
+
+import com.altisource.circus.query.impl.QueryLivestockVacAssocImpl;
+
+import java.util.List;
+import java.util.ArrayList;
+import com.mysema.query.types.expr.ComparableExpressionBase;
 
 
 
@@ -41,6 +48,14 @@ public class QueryLivestock extends com.mysema.query.sql.RelationalPathBase<Live
     public final StringPath origin = createString("origin");
 
     public final StringPath use = createString("use");
+
+    public final ListPath<String, StringPath> vacCert = this.<String, StringPath>createList("vacCert", String.class, StringPath.class, PathInits.DIRECT2);
+
+    public final ListPath<java.sql.Date, DatePath<java.sql.Date>> vacDate = this.<java.sql.Date, DatePath<java.sql.Date>>createList("vacDate", java.sql.Date.class, DatePath.class, PathInits.DIRECT2);
+
+    public final ListPath<java.sql.Date, DatePath<java.sql.Date>> vacNext = this.<java.sql.Date, DatePath<java.sql.Date>>createList("vacNext", java.sql.Date.class, DatePath.class, PathInits.DIRECT2);
+
+    public final ListPath<String, StringPath> vacType = this.<String, StringPath>createList("vacType", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final com.mysema.query.sql.PrimaryKey<LivestockEntity> animalIdPk = createPrimaryKey(animalId);
 
@@ -73,6 +88,16 @@ public class QueryLivestock extends com.mysema.query.sql.RelationalPathBase<Live
         addMetadata(name, ColumnMetadata.named("NAME").withIndex(2).ofType(Types.VARCHAR).withSize(254));
         addMetadata(origin, ColumnMetadata.named("ORIGIN").withIndex(6).ofType(Types.VARCHAR).withSize(254));
         addMetadata(use, ColumnMetadata.named("USE").withIndex(4).ofType(Types.CHAR).withSize(1));
+        addMetadata(vacCert, ColumnMetadata.named("VAC_CERT").withIndex(-1).ofType(Types.VARCHAR).withSize(254).withSubQuery(QueryLivestockVacAssocImpl.class));
+        addMetadata(vacDate, ColumnMetadata.named("VAC_DATE").withIndex(-1).ofType(Types.DATE).withSize(10).withSubQuery(QueryLivestockVacAssocImpl.class));
+        addMetadata(vacNext, ColumnMetadata.named("VAC_NEXT").withIndex(-1).ofType(Types.DATE).withSize(10).withSubQuery(QueryLivestockVacAssocImpl.class));
+        addMetadata(vacType, ColumnMetadata.named("VAC_TYPE").withIndex(-1).ofType(Types.CHAR).withSize(1).withSubQuery(QueryLivestockVacAssocImpl.class));
+    }
+
+    public List<ComparableExpressionBase<?>> getKeyVariables() {
+        List<ComparableExpressionBase<?>> results = new ArrayList<ComparableExpressionBase<?>>();
+        results.add(animalId);
+        return results;
     }
 
 }

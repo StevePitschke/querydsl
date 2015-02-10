@@ -16,6 +16,12 @@ import java.sql.Types;
 
 import com.altisource.circus.query.impl.QueryVendorsEquipCodeImpl;
 
+import com.altisource.circus.query.impl.QueryVendorsProdAssocImpl;
+
+import java.util.List;
+import java.util.ArrayList;
+import com.mysema.query.types.expr.ComparableExpressionBase;
+
 
 
 
@@ -42,6 +48,10 @@ public class QueryVendors extends com.mysema.query.sql.RelationalPathBase<Vendor
     public final ListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final StringPath fax = createString("fax");
+
+    public final ListPath<Integer, NumberPath<Integer>> itemCode = this.<Integer, NumberPath<Integer>>createList("itemCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+
+    public final ListPath<Integer, NumberPath<Integer>> leadTime = this.<Integer, NumberPath<Integer>>createList("leadTime", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final StringPath phone = createString("phone");
 
@@ -79,9 +89,17 @@ public class QueryVendors extends com.mysema.query.sql.RelationalPathBase<Vendor
         addMetadata(contact, ColumnMetadata.named("CONTACT").withIndex(7).ofType(Types.VARCHAR).withSize(254));
         addMetadata(equipCode, ColumnMetadata.named("EQUIP_CODE").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryVendorsEquipCodeImpl.class));
         addMetadata(fax, ColumnMetadata.named("FAX").withIndex(9).ofType(Types.VARCHAR).withSize(254));
+        addMetadata(itemCode, ColumnMetadata.named("ITEM_CODE").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryVendorsProdAssocImpl.class));
+        addMetadata(leadTime, ColumnMetadata.named("LEAD_TIME").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryVendorsProdAssocImpl.class));
         addMetadata(phone, ColumnMetadata.named("PHONE").withIndex(8).ofType(Types.VARCHAR).withSize(254));
         addMetadata(terms, ColumnMetadata.named("TERMS").withIndex(6).ofType(Types.VARCHAR).withSize(254));
         addMetadata(vendorCode, ColumnMetadata.named("VENDOR_CODE").withIndex(1).ofType(Types.INTEGER).withSize(10).notNull());
+    }
+
+    public List<ComparableExpressionBase<?>> getKeyVariables() {
+        List<ComparableExpressionBase<?>> results = new ArrayList<ComparableExpressionBase<?>>();
+        results.add(vendorCode);
+        return results;
     }
 
 }

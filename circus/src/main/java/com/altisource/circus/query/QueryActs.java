@@ -20,6 +20,10 @@ import com.altisource.circus.query.impl.QueryActsEquipCodeImpl;
 
 import com.altisource.circus.query.impl.QueryActsOperatorImpl;
 
+import java.util.List;
+import java.util.ArrayList;
+import com.mysema.query.types.expr.ComparableExpressionBase;
+
 
 
 
@@ -74,6 +78,12 @@ public class QueryActs extends com.mysema.query.sql.RelationalPathBase<ActsEntit
         addMetadata(duration, ColumnMetadata.named("DURATION").withIndex(3).ofType(Types.INTEGER).withSize(10));
         addMetadata(equipCode, ColumnMetadata.named("EQUIP_CODE").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryActsEquipCodeImpl.class));
         addMetadata(operator, ColumnMetadata.named("OPERATOR").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryActsOperatorImpl.class));
+    }
+
+    public List<ComparableExpressionBase<?>> getKeyVariables() {
+        List<ComparableExpressionBase<?>> results = new ArrayList<ComparableExpressionBase<?>>();
+        results.add(actNo);
+        return results;
     }
 
 }

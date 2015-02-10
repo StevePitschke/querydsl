@@ -16,7 +16,13 @@ import java.sql.Types;
 
 import com.altisource.circus.query.impl.QueryConcessionsEquipCodeImpl;
 
+import com.altisource.circus.query.impl.QueryConcessionsStockImpl;
+
 import com.altisource.circus.query.impl.QueryConcessionsOperatorImpl;
+
+import java.util.List;
+import java.util.ArrayList;
+import com.mysema.query.types.expr.ComparableExpressionBase;
 
 
 
@@ -37,7 +43,11 @@ public class QueryConcessions extends com.mysema.query.sql.RelationalPathBase<Co
 
     public final ListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
+    public final ListPath<Integer, NumberPath<Integer>> itemCode = this.<Integer, NumberPath<Integer>>createList("itemCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+
     public final ListPath<Integer, NumberPath<Integer>> operator = this.<Integer, NumberPath<Integer>>createList("operator", Integer.class, NumberPath.class, PathInits.DIRECT2);
+
+    public final ListPath<Integer, NumberPath<Integer>> qty = this.<Integer, NumberPath<Integer>>createList("qty", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final com.mysema.query.sql.PrimaryKey<ConcessionsEntity> concNoPk = createPrimaryKey(concNo);
 
@@ -65,7 +75,15 @@ public class QueryConcessions extends com.mysema.query.sql.RelationalPathBase<Co
         addMetadata(concNo, ColumnMetadata.named("CONC_NO").withIndex(1).ofType(Types.INTEGER).withSize(10).notNull());
         addMetadata(description, ColumnMetadata.named("DESCRIPTION").withIndex(2).ofType(Types.VARCHAR).withSize(254));
         addMetadata(equipCode, ColumnMetadata.named("EQUIP_CODE").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryConcessionsEquipCodeImpl.class));
+        addMetadata(itemCode, ColumnMetadata.named("ITEM_CODE").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryConcessionsStockImpl.class));
         addMetadata(operator, ColumnMetadata.named("OPERATOR").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryConcessionsOperatorImpl.class));
+        addMetadata(qty, ColumnMetadata.named("QTY").withIndex(-1).ofType(Types.INTEGER).withSize(10).withSubQuery(QueryConcessionsStockImpl.class));
+    }
+
+    public List<ComparableExpressionBase<?>> getKeyVariables() {
+        List<ComparableExpressionBase<?>> results = new ArrayList<ComparableExpressionBase<?>>();
+        results.add(concNo);
+        return results;
     }
 
 }
