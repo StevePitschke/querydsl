@@ -34,6 +34,7 @@ import com.mysema.query.sql.support.ForeignKeyData;
 import com.mysema.query.sql.support.InverseForeignKeyData;
 import com.mysema.query.sql.support.KeyData;
 import com.mysema.query.sql.support.PrimaryKeyData;
+import com.mysema.query.types.expr.ComparableExpressionBase;
 
 import static com.mysema.codegen.Symbols.*;
 
@@ -210,6 +211,10 @@ public class MetaDataSerializer extends EntitySerializer {
         		multiValueClasses.add(property.getSubQuery());
         	}
         }
+        
+        if (multiValueClasses.size() > 0) {
+        	writer.imports(List.class, ArrayList.class, ComparableExpressionBase.class);
+        }
 
         writeUserImports(writer);
     }
@@ -267,7 +272,25 @@ public class MetaDataSerializer extends EntitySerializer {
             writer.line("addMetadata(", name, ", ", columnMeta.toString(), ");");
         }
         writer.end();
+        
+        if (model.hasMultiValuedColumns()) {
 
+            List<String> keyVariables = model.getKeyVariables();
+	        Type componentType = new ClassType(TypeCategory.SIMPLE, ComparableExpressionBase.class, new Type[] { null });
+	        
+	        writer.beginPublicMethod(new ClassType(TypeCategory.LIST, List.class,
+	        		                               componentType), "getKeyVariables");
+	        
+	        writer.line("List<ComparableExpressionBase<?>> results = new ArrayList<ComparableExpressionBase<?>>();");
+	        
+	        for (String key : keyVariables) {
+	        	writer.line("results.add(" + key + ");");
+	        }
+	        
+	        writer.line("return results;");
+	        writer.end();
+        }
+        
         super.outro(model, writer);
     }
 
