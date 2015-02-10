@@ -22,6 +22,7 @@ import java.sql.DriverManager;
 import java.util.List;
 
 import com.altisource.circus.query.QueryActs;
+import com.altisource.circus.query.QueryInventory;
 import com.altisource.circus.query.QueryLivestock;
 import com.altisource.circus.query.impl.QueryActsAnimalIdImpl;
 import com.mysema.query.Tuple;
@@ -67,6 +68,18 @@ public class DoQueryActs {
         for (Tuple row : results) {
         	System.out.println(row.get(acts.actNo) + "\t" + row.get(acts.description) + "\t" + row.get(acts.animalId) +
         						"\t" + row.get(acts.equipCode));
+        }            
+        
+        System.out.println();
+        
+        QueryInventory inventory = new QueryInventory("d"); 
+        query = new UniVerseQuery(conn, dialect); 
+        results = query.from(inventory)
+            .list(inventory.cost, inventory.description, inventory.orderQty, inventory.vendorCode);
+        
+        for (Tuple row : results) {
+        	System.out.println(row.get(inventory.cost) + "\t" + row.get(inventory.description) + "\t" + row.get(inventory.orderQty) +
+        						"\t" + row.get(inventory.vendorCode));
         }            
         
         conn.close();
