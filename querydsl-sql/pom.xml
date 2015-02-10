@@ -34,7 +34,7 @@
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-spatial</artifactId>
-      <version>${parent.version|</version>
+      <version>${parent.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -196,6 +196,21 @@
     	<groupId>com.mysema.querydsl</groupId>
     	<artifactId>querydsl-codegen</artifactId>
     	<version>${project.version}</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.geolatte</groupId>
+    	<artifactId>geolatte-geom</artifactId>
+    	<version>0.13</version>
+    </dependency>
+    <dependency>
+    	<groupId>postgresql</groupId>
+    	<artifactId>postgresql</artifactId>
+    	<version>8.3-603.jdbc4</version>
+    </dependency>
+   <dependency>
+ 	  <groupId>org.opengeo</groupId>
+	  <artifactId>geodb</artifactId>
+	  <version>0.8</version>
     </dependency>
   </dependencies>
   
