@@ -18,13 +18,13 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.mysema.query.DefaultQueryMetadata;
 import com.mysema.query.JoinExpression;
 import com.mysema.query.JoinType;
-import com.mysema.query.QueryFlag.Position;
 import com.mysema.query.QueryMetadata;
 import com.mysema.query.Tuple;
 import com.mysema.query.sql.AbstractSQLQuery;
@@ -41,9 +41,9 @@ import com.mysema.query.types.Ops;
 import com.mysema.query.types.Path;
 import com.mysema.query.types.QTuple;
 import com.mysema.query.types.expr.BooleanExpression;
+import com.mysema.query.types.expr.BooleanOperation;
 import com.mysema.query.types.expr.ComparableExpressionBase;
-import com.mysema.query.types.expr.Wildcard;
-import com.mysema.query.types.path.ListPath;
+import com.mysema.query.types.path.MultiValueListPath;
 import com.mysema.query.types.path.NumberPath;
 import com.mysema.query.types.path.StringPath;
 
@@ -56,10 +56,9 @@ import com.mysema.query.types.path.StringPath;
  */
 public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 
-    private static final String WHEN = "\nwhen ";
-    
     private final Connection conn;
     private boolean recursedThruList = false;
+    private List<BooleanOperation> whenClauses = new LinkedList<BooleanOperation>();
 
     public UniVerseQuery(Connection conn) {
         this(conn, new Configuration(new UniVerseTemplates()), new DefaultQueryMetadata());
@@ -107,11 +106,16 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
         return this;
     }
 
-    /**
-     * @return
-     */
-    public UniVerseQuery when(BooleanExpression whenClause) {
-        return addFlag(Position.BEFORE_GROUP_BY, WHEN, whenClause);
+    public UniVerseQuery when(BooleanExpression whenClause) {    	
+    	this.whenClauses.add((BooleanOperation)whenClause);   	
+        return this;
+    }
+
+    public UniVerseQuery when(BooleanExpression... whenClause) { 
+    	for (BooleanExpression o : whenClause) {
+    		this.whenClauses.add((BooleanOperation)o); 
+    	}
+        return this;
     }
 
 	/* (non-Javadoc)
@@ -128,22 +132,24 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		}
 		
 		List<Expression<?>> newArgs = new ArrayList<Expression<?>>();
-		Map<Class<? extends RelationalPathBase<?>>, List<ListPath<?,?>>> listArgs =
-			new HashMap<Class<? extends RelationalPathBase<?>>, List<ListPath<?,?>>>();
+		Map<Class<? extends RelationalPathBase<?>>, List<Path<?>>> listArgs =
+			new HashMap<Class<? extends RelationalPathBase<?>>, List<Path<?>>>();
 		RelationalPathBase<?> queryObj = (RelationalPathBase<?>)joins.get(0).getTarget();
 		
 		for (Expression<?> expr : args) {
-			if (expr instanceof ListPath<?, ?> && queryObj.getMetadata((ListPath<?, ?>)expr).isMultiValued()) {
+			
+			if (expr instanceof MultiValueListPath) {
 				
-				Class<? extends RelationalPathBase<?>> subQuery = queryObj.getMetadata((ListPath<?, ?>)expr).getSubQuery();
-				List<ListPath<?,?>> list = listArgs.get(subQuery);
+				Class<? extends RelationalPathBase<?>> subQuery =
+					queryObj.getMetadata((Path<?>)expr).getSubQuery();
+				List<Path<?>> list = listArgs.get(subQuery);
 				
 				if (list == null) {
-					list = new ArrayList<ListPath<?,?>>();
+					list = new ArrayList<Path<?>>();
 					listArgs.put(subQuery, list);
 				}
 				
-				list.add((ListPath<?,?>)expr);
+				list.add((Path<?>)expr);
 				
 			} else {
 				newArgs.add(expr);
@@ -185,11 +191,9 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		}
 		
 		QTuple qtuple = null;
-		int sequence = 0;
 		int rowCount = 0;
 		
-		List<RelationalPathBase<?>> subQueryObjects = new ArrayList<RelationalPathBase<?>>();
-		
+		List<RelationalPathBase<?>> subQueryObjects = new ArrayList<RelationalPathBase<?>>();		
 		List<List<Path<?>>> selectFieldLists = new ArrayList<List<Path<?>>>();
 		
 		for (Tuple row : results) {
@@ -207,7 +211,7 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 				RelationalPathBase<?> subQueryObj;
 				try {
 					if (rowCount == 0) {
-						subQueryObj = subQueryClass.getConstructor(String.class).newInstance("SUB_QUERY_" + sequence++);
+						subQueryObj = subQueryClass.getConstructor(String.class).newInstance("SUB_QUERY");
 						subQueryObjects.add(subQueryObj);
 					} else {
 						subQueryObj = subQueryObjects.get(fieldCount);
@@ -258,7 +262,7 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 				
 					selectFields = new ArrayList<Path<?>>();
 					
-					for (ListPath<?,?> multiValuedField : listArgs.get(subQueryClass)) {
+					for (Path<?> multiValuedField : listArgs.get(subQueryClass)) {
 					
 						for (Path<?> column : subQueryObj.getColumns()) {
 							
@@ -285,6 +289,11 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		        UniVerseQuery query = new UniVerseQuery(conn)
 		        	.from(subQueryObj)
 		        	.where(where);
+		        
+//		        for (BooleanOperation o : whenClauses) {
+//		        	query = query.where(o);
+//		        }
+		        
 		        List<Tuple> subResults = 
 		            query.list(selectFields.toArray(new Path<?>[selectFields.size()]));
 		        
@@ -310,7 +319,6 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		return results;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <RT> List<RT> list(Expression<RT> expr) {
 		

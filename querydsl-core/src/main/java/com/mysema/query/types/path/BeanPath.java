@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ package com.mysema.query.types.path;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -225,6 +226,51 @@ public class BeanPath<T> extends SimpleExpression<T> implements Path<T> {
     @SuppressWarnings("unchecked")
     protected <A, E extends SimpleExpression<? super A>> ListPath<A, E> createList(String property, Class<? super A> type, Class<? super E> queryType, PathInits inits) {
         return add(new ListPath<A, E>(type, (Class) queryType, forProperty(property), inits));
+    }
+
+    /**
+     * Create a new multi-valued Number List typed path
+     *
+     * @param <A>
+     * @param <E>
+     * @param property
+     * @param type
+     * @param queryType
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    protected <A extends Number & Comparable<?>, E extends SimpleExpression<? super A>> MultiValueNumberListPath<A, E> createMultiValuedNumberList(String property, Class<? super A> type, Class<? super E> queryType, PathInits inits) {
+        return add(new MultiValueNumberListPath<A, E>(type, (Class) queryType, forProperty(property), inits));
+    }
+
+    /**
+     * Create a new multi-valued String List typed path
+     * 
+     * @param <A>
+     * @param <E>
+     * @param property
+     * @param type
+     * @param queryType
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    protected <E extends SimpleExpression<String>> MultiValueStringListPath<E> createMultiValuedStringList(String property, Class<String> type, Class<? super E> queryType, PathInits inits) {
+        return add(new MultiValueStringListPath<E>((Class) queryType, forProperty(property), inits));
+    }
+
+    /**
+     * Create a new multi-valued Date List typed path
+     * 
+     * @param <A>
+     * @param <E>
+     * @param property
+     * @param type
+     * @param queryType
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    protected <E extends SimpleExpression<Date>> MultiValueDateListPath<E> createMultiValuedDateList(String property, Class<Date> type, Class<? super E> queryType, PathInits inits) {
+        return add(new MultiValueDateListPath<E>((Class) queryType, forProperty(property), inits));
     }
 
     /**
