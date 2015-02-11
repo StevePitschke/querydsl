@@ -47,29 +47,29 @@ public class QueryLocations extends com.mysema.query.sql.RelationalPathBase<Loca
 
     public final StringPath fax = createString("fax");
 
-    public final ListPath<String, StringPath> govAgency = this.<String, StringPath>createList("govAgency", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> govAgency = this.<StringPath>createMultiValuedStringList("govAgency", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> govCheck = this.<String, StringPath>createList("govCheck", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> govCheck = this.<StringPath>createMultiValuedStringList("govCheck", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> govContact = this.<String, StringPath>createList("govContact", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> govContact = this.<StringPath>createMultiValuedStringList("govContact", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> govFax = this.<String, StringPath>createList("govFax", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> govFax = this.<StringPath>createMultiValuedStringList("govFax", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Double, NumberPath<Double>> govFee = this.<Double, NumberPath<Double>>createList("govFee", Double.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Double, NumberPath<Double>> govFee = this.<Double, NumberPath<Double>>createMultiValuedNumberList("govFee", Double.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> govPhone = this.<String, StringPath>createList("govPhone", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> govPhone = this.<StringPath>createMultiValuedStringList("govPhone", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Double, NumberPath<Double>> govRate = this.<Double, NumberPath<Double>>createList("govRate", Double.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Double, NumberPath<Double>> govRate = this.<Double, NumberPath<Double>>createMultiValuedNumberList("govRate", Double.class, NumberPath.class, PathInits.DIRECT2);
 
     public final StringPath locationCode = createString("locationCode");
 
-    public final ListPath<String, StringPath> mediaContact = this.<String, StringPath>createList("mediaContact", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> mediaContact = this.<StringPath>createMultiValuedStringList("mediaContact", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> mediaFax = this.<String, StringPath>createList("mediaFax", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> mediaFax = this.<StringPath>createMultiValuedStringList("mediaFax", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> mediaName = this.<String, StringPath>createList("mediaName", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> mediaName = this.<StringPath>createMultiValuedStringList("mediaName", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> mediaPhone = this.<String, StringPath>createList("mediaPhone", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> mediaPhone = this.<StringPath>createMultiValuedStringList("mediaPhone", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final StringPath name = createString("name");
 

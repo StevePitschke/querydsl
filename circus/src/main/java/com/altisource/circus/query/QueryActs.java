@@ -39,15 +39,15 @@ public class QueryActs extends com.mysema.query.sql.RelationalPathBase<ActsEntit
 
     public final NumberPath<Integer> actNo = createNumber("actNo", Integer.class);
 
-    public final ListPath<Integer, NumberPath<Integer>> animalId = this.<Integer, NumberPath<Integer>>createList("animalId", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> animalId = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("animalId", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final StringPath description = createString("description");
 
     public final NumberPath<Integer> duration = createNumber("duration", Integer.class);
 
-    public final ListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Integer, NumberPath<Integer>> operator = this.<Integer, NumberPath<Integer>>createList("operator", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> operator = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("operator", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final com.mysema.query.sql.PrimaryKey<ActsEntity> actNoPk = createPrimaryKey(actNo);
 

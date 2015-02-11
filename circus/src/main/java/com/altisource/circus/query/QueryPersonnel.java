@@ -39,9 +39,9 @@ public class QueryPersonnel extends com.mysema.query.sql.RelationalPathBase<Pers
 
     public static final QueryPersonnel personnel = new QueryPersonnel("PERSONNEL.T");
 
-    public final ListPath<Integer, NumberPath<Integer>> actNo = this.<Integer, NumberPath<Integer>>createList("actNo", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> actNo = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("actNo", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Double, NumberPath<Double>> actPay = this.<Double, NumberPath<Double>>createList("actPay", Double.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Double, NumberPath<Double>> actPay = this.<Double, NumberPath<Double>>createMultiValuedNumberList("actPay", Double.class, NumberPath.class, PathInits.DIRECT2);
 
     public final StringPath adr1 = createString("adr1");
 
@@ -53,25 +53,25 @@ public class QueryPersonnel extends com.mysema.query.sql.RelationalPathBase<Pers
 
     public final StringPath benefits = createString("benefits");
 
-    public final ListPath<java.sql.Date, DatePath<java.sql.Date>> depDob = this.<java.sql.Date, DatePath<java.sql.Date>>createList("depDob", java.sql.Date.class, DatePath.class, PathInits.DIRECT2);
+    public final MultiValueDateListPath<DatePath<java.sql.Date>> depDob = this.<DatePath<java.sql.Date>>createMultiValuedDateList("depDob", java.sql.Date.class, DatePath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> depName = this.<String, StringPath>createList("depName", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> depName = this.<StringPath>createMultiValuedStringList("depName", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> depRelation = this.<String, StringPath>createList("depRelation", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> depRelation = this.<StringPath>createMultiValuedStringList("depRelation", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final DatePath<java.sql.Date> dob = createDate("dob", java.sql.Date.class);
 
-    public final ListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Double, NumberPath<Double>> equipPay = this.<Double, NumberPath<Double>>createList("equipPay", Double.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Double, NumberPath<Double>> equipPay = this.<Double, NumberPath<Double>>createMultiValuedNumberList("equipPay", Double.class, NumberPath.class, PathInits.DIRECT2);
 
     public final StringPath name = createString("name");
 
     public final StringPath phone = createString("phone");
 
-    public final ListPath<Integer, NumberPath<Integer>> rideId = this.<Integer, NumberPath<Integer>>createList("rideId", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> rideId = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("rideId", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Double, NumberPath<Double>> ridePay = this.<Double, NumberPath<Double>>createList("ridePay", Double.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Double, NumberPath<Double>> ridePay = this.<Double, NumberPath<Double>>createMultiValuedNumberList("ridePay", Double.class, NumberPath.class, PathInits.DIRECT2);
 
     public final com.mysema.query.sql.PrimaryKey<PersonnelEntity> badgeNoPk = createPrimaryKey(badgeNo);
 

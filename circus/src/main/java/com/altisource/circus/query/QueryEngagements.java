@@ -39,23 +39,23 @@ public class QueryEngagements extends com.mysema.query.sql.RelationalPathBase<En
 
     public static final QueryEngagements engagements = new QueryEngagements("ENGAGEMENTS.T");
 
-    public final ListPath<Integer, NumberPath<Integer>> actNo = this.<Integer, NumberPath<Integer>>createList("actNo", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> actNo = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("actNo", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final NumberPath<Double> advance = createNumber("advance", Double.class);
 
-    public final ListPath<Integer, NumberPath<Integer>> concId = this.<Integer, NumberPath<Integer>>createList("concId", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> concId = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("concId", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Double, NumberPath<Double>> concRevenue = this.<Double, NumberPath<Double>>createList("concRevenue", Double.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Double, NumberPath<Double>> concRevenue = this.<Double, NumberPath<Double>>createMultiValuedNumberList("concRevenue", Double.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Integer, NumberPath<Integer>> concTickets = this.<Integer, NumberPath<Integer>>createList("concTickets", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> concTickets = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("concTickets", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final DatePath<java.sql.Date> date = createDate("date", java.sql.Date.class);
 
-    public final ListPath<Integer, NumberPath<Integer>> gateNumber = this.<Integer, NumberPath<Integer>>createList("gateNumber", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> gateNumber = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("gateNumber", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Double, NumberPath<Double>> gateRevenue = this.<Double, NumberPath<Double>>createList("gateRevenue", Double.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Double, NumberPath<Double>> gateRevenue = this.<Double, NumberPath<Double>>createMultiValuedNumberList("gateRevenue", Double.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Integer, NumberPath<Integer>> gateTickets = this.<Integer, NumberPath<Integer>>createList("gateTickets", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> gateTickets = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("gateTickets", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> labor = createNumber("labor", Integer.class);
 
@@ -63,11 +63,11 @@ public class QueryEngagements extends com.mysema.query.sql.RelationalPathBase<En
 
     public final NumberPath<Double> pay = createNumber("pay", Double.class);
 
-    public final ListPath<Integer, NumberPath<Integer>> rideId = this.<Integer, NumberPath<Integer>>createList("rideId", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> rideId = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("rideId", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Double, NumberPath<Double>> rideRevenue = this.<Double, NumberPath<Double>>createList("rideRevenue", Double.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Double, NumberPath<Double>> rideRevenue = this.<Double, NumberPath<Double>>createMultiValuedNumberList("rideRevenue", Double.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Integer, NumberPath<Integer>> rideTickets = this.<Integer, NumberPath<Integer>>createList("rideTickets", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> rideTickets = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("rideTickets", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final TimePath<java.sql.Time> time = createTime("time", java.sql.Time.class);
 

@@ -45,13 +45,13 @@ public class QueryVendors extends com.mysema.query.sql.RelationalPathBase<Vendor
 
     public final StringPath contact = createString("contact");
 
-    public final ListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final StringPath fax = createString("fax");
 
-    public final ListPath<Integer, NumberPath<Integer>> itemCode = this.<Integer, NumberPath<Integer>>createList("itemCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> itemCode = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("itemCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Integer, NumberPath<Integer>> leadTime = this.<Integer, NumberPath<Integer>>createList("leadTime", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> leadTime = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("leadTime", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final StringPath phone = createString("phone");
 

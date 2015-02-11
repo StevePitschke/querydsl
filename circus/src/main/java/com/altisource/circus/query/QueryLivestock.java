@@ -49,13 +49,13 @@ public class QueryLivestock extends com.mysema.query.sql.RelationalPathBase<Live
 
     public final StringPath use = createString("use");
 
-    public final ListPath<String, StringPath> vacCert = this.<String, StringPath>createList("vacCert", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> vacCert = this.<StringPath>createMultiValuedStringList("vacCert", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<java.sql.Date, DatePath<java.sql.Date>> vacDate = this.<java.sql.Date, DatePath<java.sql.Date>>createList("vacDate", java.sql.Date.class, DatePath.class, PathInits.DIRECT2);
+    public final MultiValueDateListPath<DatePath<java.sql.Date>> vacDate = this.<DatePath<java.sql.Date>>createMultiValuedDateList("vacDate", java.sql.Date.class, DatePath.class, PathInits.DIRECT2);
 
-    public final ListPath<java.sql.Date, DatePath<java.sql.Date>> vacNext = this.<java.sql.Date, DatePath<java.sql.Date>>createList("vacNext", java.sql.Date.class, DatePath.class, PathInits.DIRECT2);
+    public final MultiValueDateListPath<DatePath<java.sql.Date>> vacNext = this.<DatePath<java.sql.Date>>createMultiValuedDateList("vacNext", java.sql.Date.class, DatePath.class, PathInits.DIRECT2);
 
-    public final ListPath<String, StringPath> vacType = this.<String, StringPath>createList("vacType", String.class, StringPath.class, PathInits.DIRECT2);
+    public final MultiValueStringListPath<StringPath> vacType = this.<StringPath>createMultiValuedStringList("vacType", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final com.mysema.query.sql.PrimaryKey<LivestockEntity> animalIdPk = createPrimaryKey(animalId);
 

@@ -37,9 +37,9 @@ public class QueryRides extends com.mysema.query.sql.RelationalPathBase<RidesEnt
 
     public final StringPath description = createString("description");
 
-    public final ListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Integer, NumberPath<Integer>> operator = this.<Integer, NumberPath<Integer>>createList("operator", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> operator = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("operator", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> rideId = createNumber("rideId", Integer.class);
 

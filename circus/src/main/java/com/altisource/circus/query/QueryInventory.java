@@ -41,13 +41,13 @@ public class QueryInventory extends com.mysema.query.sql.RelationalPathBase<Inve
 
     public final StringPath itemType = createString("itemType");
 
-    public final ListPath<Integer, NumberPath<Integer>> orderQty = this.<Integer, NumberPath<Integer>>createList("orderQty", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> orderQty = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("orderQty", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final NumberPath<Double> price = createNumber("price", Double.class);
 
     public final NumberPath<Integer> qoh = createNumber("qoh", Integer.class);
 
-    public final ListPath<Integer, NumberPath<Integer>> vendorCode = this.<Integer, NumberPath<Integer>>createList("vendorCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> vendorCode = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("vendorCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final com.mysema.query.sql.PrimaryKey<InventoryEntity> itemCodePk = createPrimaryKey(itemCode);
 

@@ -41,13 +41,13 @@ public class QueryConcessions extends com.mysema.query.sql.RelationalPathBase<Co
 
     public final StringPath description = createString("description");
 
-    public final ListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> equipCode = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("equipCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Integer, NumberPath<Integer>> itemCode = this.<Integer, NumberPath<Integer>>createList("itemCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> itemCode = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("itemCode", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Integer, NumberPath<Integer>> operator = this.<Integer, NumberPath<Integer>>createList("operator", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> operator = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("operator", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
-    public final ListPath<Integer, NumberPath<Integer>> qty = this.<Integer, NumberPath<Integer>>createList("qty", Integer.class, NumberPath.class, PathInits.DIRECT2);
+    public final MultiValueNumberListPath<Integer, NumberPath<Integer>> qty = this.<Integer, NumberPath<Integer>>createMultiValuedNumberList("qty", Integer.class, NumberPath.class, PathInits.DIRECT2);
 
     public final com.mysema.query.sql.PrimaryKey<ConcessionsEntity> concNoPk = createPrimaryKey(concNo);
 

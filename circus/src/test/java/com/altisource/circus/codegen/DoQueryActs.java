@@ -64,6 +64,7 @@ public class DoQueryActs {
         query = new UniVerseQuery(conn, dialect); 
         results = query.from(acts)
             .where(acts.description.like("%the%"))
+            .when(acts.animalId.lt(40).and(acts.equipCode.lt(50)))
             .list(acts.animalId, acts.description, acts.equipCode);
         
         for (Tuple row : results) {
