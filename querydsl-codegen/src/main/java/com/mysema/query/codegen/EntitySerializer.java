@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015 Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -778,9 +778,12 @@ public class EntitySerializer implements Serializer {
                 genericKey = writer.getGenericName(true, property.getParameter(0));
                 localRawName = writer.getRawName(property.getParameter(0));
                 queryType = typeMappings.getPathType(property.getParameter(0), model, true);
+                Type rawType = getRaw(property.getParameter(0));
+                boolean isString = rawType.getFullName().equals("java.lang.String");
+                boolean isDate = rawType.getFullName().equals("java.sql.Date");
 
-                serialize(model, property, new ClassType(ListPath.class, getRaw(property.getParameter(0)), genericQueryType),
-                        writer, "this.<"+genericKey + COMMA + writer.getGenericName(true, genericQueryType) + ">createList",
+                serialize(model, property, property.isMultivalued() ? (isString ? new ClassType(MultiValueStringListPath.class, genericQueryType) : (isDate ? new ClassType(MultiValueDateListPath.class, genericQueryType) : new ClassType(MultiValueNumberListPath.class, rawType, genericQueryType))) : new ClassType(ListPath.class, rawType, genericQueryType),
+                        writer, "this.<" + ((property.isMultivalued() && (isString || isDate)) ? "" : (genericKey + COMMA)) + writer.getGenericName(true, genericQueryType) + (property.isMultivalued() ? (">createMultiValued" + (isString ? "String" : (isDate ? "Date" : "Number" )) +  "List") : ">createList"),
                         writer.getClassConstant(localRawName), writer.getClassConstant(writer.getRawName(queryType)), inits);
                 break;
 
