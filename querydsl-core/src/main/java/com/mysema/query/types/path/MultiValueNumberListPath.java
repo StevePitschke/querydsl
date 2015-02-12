@@ -27,9 +27,12 @@ import com.mysema.query.types.PathImpl;
 import com.mysema.query.types.PathMetadata;
 import com.mysema.query.types.PathMetadataFactory;
 import com.mysema.query.types.Visitor;
+import com.mysema.query.types.Ops.MathOps;
 import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.expr.BooleanOperation;
 import com.mysema.query.types.expr.MultiValueNumberListExpression;
+import com.mysema.query.types.expr.NumberExpression;
+import com.mysema.query.types.expr.NumberOperation;
 import com.mysema.query.types.expr.SimpleExpression;
 import com.mysema.util.MathUtils;
 
@@ -50,7 +53,13 @@ public class MultiValueNumberListPath<E extends Number & Comparable<?>, Q extend
     private final Class<Q> queryType;
 
     @Nullable
-    private transient Q any;    
+    private transient Q any;
+    
+    @Nullable
+    private volatile NumberExpression<E> abs, sum;
+
+    @Nullable
+    private volatile NumberExpression<Double> sqrt;
 
     public MultiValueNumberListPath(Class<? super E> elementType, Class<Q> queryType, String variable) {
         this(elementType, queryType, PathMetadataFactory.forVariable(variable));
@@ -134,6 +143,33 @@ public class MultiValueNumberListPath<E extends Number & Comparable<?>, Q extend
             throw new IndexOutOfBoundsException(String.valueOf(index));
         }
     }
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.types.expr.MultiValueNumberListExpression#abs()
+	 */
+	@Override
+	public NumberExpression<E> abs() {
+        if (abs == null) {
+            abs = NumberOperation.create(elementType, MathOps.ABS, pathMixin);
+        }
+        return abs;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.types.expr.MultiValueNumberListExpression#add(com.mysema.query.types.Expression)
+	 */
+	@Override
+	public NumberExpression<E> add(Expression<E> right) {
+        return NumberOperation.create(elementType, Ops.ADD, pathMixin, right);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.types.expr.MultiValueNumberListExpression#add(java.lang.Number)
+	 */
+	@Override
+	public NumberExpression<E> add(E right) {
+        return NumberOperation.create(elementType, Ops.ADD, pathMixin, ConstantImpl.create(cast(right)));
+	}
 
 	@Override
 	public <A extends Number & Comparable<?>> BooleanExpression goe(A right) {
@@ -240,4 +276,42 @@ public class MultiValueNumberListPath<E extends Number & Comparable<?>, Q extend
     private E cast(Number num) {    	
     	return MathUtils.cast(num, elementType);
     }
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.types.expr.MultiValueNumberListExpression#sqrt()
+	 */
+	@Override
+	public NumberExpression<Double> sqrt() {
+        if (sqrt == null) {
+            sqrt = NumberOperation.create(Double.class, MathOps.SQRT, pathMixin);
+        }
+        return sqrt;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.types.expr.MultiValueNumberListExpression#subtract(com.mysema.query.types.Expression)
+	 */
+	@Override
+	public NumberExpression<E> subtract(Expression<E> right) {
+        return NumberOperation.create(elementType, Ops.SUB, pathMixin, right);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.types.expr.MultiValueNumberListExpression#subtract(java.lang.Number)
+	 */
+	@Override
+	public NumberExpression<E> subtract(E right) {
+        return NumberOperation.create(elementType, Ops.SUB, pathMixin, ConstantImpl.create(cast(right)));
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mysema.query.types.expr.MultiValueNumberListExpression#sum()
+	 */
+	@Override
+	public NumberExpression<E> sum() {
+        if (sum == null) {
+            sum = NumberOperation.create(elementType, Ops.AggOps.SUM_AGG, pathMixin);
+        }
+        return sum;
+	}
 }
