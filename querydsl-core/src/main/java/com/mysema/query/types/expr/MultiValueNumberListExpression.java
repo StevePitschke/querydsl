@@ -16,6 +16,7 @@ package com.mysema.query.types.expr;
 import javax.annotation.Nullable;
 
 import com.mysema.query.types.Expression;
+import com.mysema.query.types.path.MultiValueNumberListPath;
 
 /**
  * NumberExpression represents a numeric expression
@@ -49,6 +50,14 @@ public interface MultiValueNumberListExpression<E extends Number & Comparable<?>
      * @return this + right
      */
 	NumberExpression<E> add(E right);
+
+    /**
+     * Get the sum of this and right
+     *
+     * @param right
+     * @return this + right
+     */
+	<N extends MultiValueNumberListPath<E, Q>> NumberExpression<E> add(N right);
 
     /**
      * Create a {@code this >= right} expression
@@ -222,6 +231,14 @@ public interface MultiValueNumberListExpression<E extends Number & Comparable<?>
     * @return this - right
     */
    NumberExpression<E> subtract(E right);
+
+   /**
+    * Get the sum of this and right
+    *
+    * @param right
+    * @return this + right
+    */
+	<N extends MultiValueNumberListPath<E, Q>> NumberExpression<E> subtract(N right);
 
    /**
     * Get the sum of this expression (aggregation)
