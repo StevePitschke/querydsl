@@ -167,6 +167,8 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 			return super.list(args);
 		}
 		
+		int topItemsNum = newArgs.size();
+		
 		List<ComparableExpressionBase<?>> keys = queryObj.getKeyVariables();
 		
 		for (ComparableExpressionBase<?> key : keys) {
@@ -193,12 +195,16 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		
 		List<Expression<?>> qlist = new ArrayList<Expression<?>>();
 		
+		int topCount = 0;
+		
 		for (Expression<?> expr : newArgs) {
+			
+			if (topCount++ == topItemsNum) {
+				break;
+			}
+			
 			qlist.add(expr);
 		}
-		
-		QTuple qtuple = null;
-		int rowCount = 0;
 		
 		List<RelationalPathBase<?>> subQueryObjects = new ArrayList<RelationalPathBase<?>>();
 		List<List<Expression<?>>> selectFieldLists = new ArrayList<List<Expression<?>>>();
@@ -223,6 +229,8 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 			
 			selectFieldLists.add(selectFields);
 		}
+		
+		QTuple qtuple = new QTuple(qlist.toArray(new Expression<?>[qlist.size()]));
 		
 		Map<Class<? extends RelationalPathBase<?>>, List<Expression<?>>> whenClauses =
 				new HashMap<Class<? extends RelationalPathBase<?>>, List<Expression<?>>>();
@@ -256,12 +264,21 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 			}
         }
         
+        int rowCount = 0;
+        
 		for (Tuple row : results) {
 			
-			List<Object> values = new ArrayList<Object>();			
+			List<Object> values = new ArrayList<Object>();
+			
+			topCount = 0;
 			
 			for (Expression<?> expr : newArgs) {
+				
 				values.add(row.get(expr));
+				
+				if (++topCount == topItemsNum) {
+					break;
+				}
 			}
 			
 			int fieldCount = 0;
@@ -319,22 +336,22 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 				}
 		        
 		        List<Tuple> subResults = 
-		            query.list(selectFields.toArray(new Path<?>[selectFields.size()]));
+		            query.list(selectFields.toArray(new Expression<?>[selectFields.size()]));
+		        
+		        int colNo = 0;
 		        
 				for (Expression<?> column : selectFields) {
 
 					List<Object> multiValue = new ArrayList<Object>();
 					
 					for (Tuple subRow : subResults) {
-						multiValue.add(subRow.get(column));
+						multiValue.add(subRow.get(colNo, Object.class));
 					}
 					
 					values.add(multiValue);
+					
+					colNo++;
 				}
-			}
-			
-			if (rowCount == 0) {
-				qtuple = new QTuple(qlist.toArray(new Expression<?>[qlist.size()]));
 			}
 			
 			results.set(rowCount++, qtuple.newInstance(values.toArray(new Object[values.size()])));
