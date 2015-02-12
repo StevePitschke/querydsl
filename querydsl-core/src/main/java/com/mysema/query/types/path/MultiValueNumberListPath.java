@@ -172,6 +172,11 @@ public class MultiValueNumberListPath<E extends Number & Comparable<?>, Q extend
 	}
 
 	@Override
+	public <N extends MultiValueNumberListPath<E, Q>> NumberExpression<E> add(N right) {
+        return NumberOperation.create(elementType, Ops.ADD, pathMixin, right);
+	}
+
+	@Override
 	public <A extends Number & Comparable<?>> BooleanExpression goe(A right) {
         return goe(ConstantImpl.create(cast(right)));
 	}
@@ -302,6 +307,11 @@ public class MultiValueNumberListPath<E extends Number & Comparable<?>, Q extend
 	@Override
 	public NumberExpression<E> subtract(E right) {
         return NumberOperation.create(elementType, Ops.SUB, pathMixin, ConstantImpl.create(cast(right)));
+	}
+
+	@Override
+	public <N extends MultiValueNumberListPath<E, Q>> NumberExpression<E> subtract(N right) {
+        return NumberOperation.create(elementType, Ops.SUB, pathMixin, right);
 	}
 
 	/* (non-Javadoc)
