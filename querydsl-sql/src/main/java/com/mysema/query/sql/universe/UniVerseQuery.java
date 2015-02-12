@@ -497,32 +497,32 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		
 		List<Expression<?>> args = new ArrayList<Expression<?>>();
 		
-		if (expr instanceof Operation<?>) {
+		if (expr instanceof BooleanOperation) {
 			
-			for (Expression<?> arg : ((Operation<?>)expr).getArgs()) {			
+			for (Expression<?> arg : ((BooleanOperation)expr).getArgs()) {			
 				args.add(rewriteMultiValuedExpression(arg, subQueryObj));
 			}
 			
-			Operation<?> operation =
-					new OperationImpl<Object>(Object.class, (Operator<Object>)((Operation<?>)expr).getOperator(),
+			Predicate predicate =
+					new PredicateOperation((Operator<Boolean>)((Operation<?>)expr).getOperator(),
 							ImmutableList.<Expression<?>>copyOf(args));
 			
-			return operation;
+			return predicate;
 		}
 		
-		if (! (expr instanceof BooleanOperation)) {
+		if (! (expr instanceof Operation<?>)) {
 			throw new IllegalStateException("Unknown state in expression evaluation: " + expr);
 		}
 		
-		for (Expression<?> arg : ((BooleanOperation)expr).getArgs()) {			
+		for (Expression<?> arg : ((Operation<?>)expr).getArgs()) {			
 			args.add(rewriteMultiValuedExpression(arg, subQueryObj));
 		}
 		
-		Predicate predicate =
-				new PredicateOperation((Operator<Boolean>)((Operation<?>)expr).getOperator(),
+		Operation<?> operation =
+				new OperationImpl<Object>(Object.class, (Operator<Object>)((Operation<?>)expr).getOperator(),
 						ImmutableList.<Expression<?>>copyOf(args));
 		
-		return predicate;
+		return operation;
 	}
     
 	private Expression<?> rewriteMultiValuedExpression(Expression<?> expr,
