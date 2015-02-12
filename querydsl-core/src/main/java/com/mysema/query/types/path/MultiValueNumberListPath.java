@@ -43,8 +43,10 @@ public class MultiValueNumberListPath<E extends Number & Comparable<?>, Q extend
 
     private final Class<E> elementType;
 
-    private final PathImpl<List<E>> pathMixin;
-
+    private final MultiValueNumberListPath<E, Q> pathMixin;
+    
+    private final PathImpl<List<E>> parentMixin;
+    
     private final Class<Q> queryType;
 
     @Nullable
@@ -62,12 +64,21 @@ public class MultiValueNumberListPath<E extends Number & Comparable<?>, Q extend
         this(elementType, queryType, metadata, PathInits.DIRECT);
     }
     
+    private MultiValueNumberListPath(Class<? super E> elementType, Class<Q> queryType, PathMetadata<?> metadata, MultiValueNumberListPath<E, Q> parent, PathImpl<List<E>> mixin) {
+        super(new PathImpl<List<E>>((Class)List.class, metadata), PathInits.DIRECT);
+        this.elementType = (Class<E>)elementType;
+        this.queryType = queryType;
+        this.pathMixin = parent;
+        this.parentMixin = mixin;
+    }
+    
     @SuppressWarnings("unchecked")
     public MultiValueNumberListPath(Class<? super E> elementType, Class<Q> queryType, PathMetadata<?> metadata, PathInits inits) {
         super(new PathImpl<List<E>>((Class)List.class, metadata), inits);
         this.elementType = (Class<E>)elementType;
         this.queryType = queryType;
-        this.pathMixin = (PathImpl<List<E>>)mixin;
+        this.pathMixin = new MultiValueNumberListPath<E, Q>(elementType, queryType, metadata, this, (PathImpl<List<E>>)mixin);
+        this.parentMixin = (PathImpl<List<E>>)mixin;
     }
     
     @Override
@@ -102,12 +113,12 @@ public class MultiValueNumberListPath<E extends Number & Comparable<?>, Q extend
 
     @Override
     public PathMetadata<?> getMetadata() {
-        return pathMixin.getMetadata();
+        return parentMixin.getMetadata();
     }
 
     @Override
     public Path<?> getRoot() {
-        return pathMixin.getRoot();
+        return parentMixin.getRoot();
     }
 
     @Override

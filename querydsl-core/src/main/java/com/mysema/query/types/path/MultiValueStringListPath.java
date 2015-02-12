@@ -40,7 +40,9 @@ public class MultiValueStringListPath<Q extends SimpleExpression<String>> extend
 
 	private static final long serialVersionUID = -1873958849624881622L;
 
-    private final PathImpl<List<String>> pathMixin;
+    private final MultiValueStringListPath<Q> pathMixin;
+
+    private final PathImpl<List<String>> parentMixin;
 
     private final Class<Q> queryType;
 
@@ -59,11 +61,19 @@ public class MultiValueStringListPath<Q extends SimpleExpression<String>> extend
         this(queryType, metadata, PathInits.DIRECT);
     }
     
+    private MultiValueStringListPath(Class<Q> queryType, PathMetadata<?> metadata, MultiValueStringListPath<Q> parent, PathImpl<List<String>> mixin) {
+        super(new PathImpl<List<String>>((Class)List.class, metadata), PathInits.DIRECT);
+        this.queryType = queryType;
+        this.pathMixin = parent;
+        this.parentMixin = mixin;
+    }
+    
     @SuppressWarnings("unchecked")
     public MultiValueStringListPath(Class<Q> queryType, PathMetadata<?> metadata, PathInits inits) {
         super(new PathImpl<List<String>>((Class)List.class, metadata), inits);
         this.queryType = queryType;
-        this.pathMixin = (PathImpl<List<String>>)mixin;
+        this.pathMixin = new MultiValueStringListPath<Q>(queryType, metadata, this, (PathImpl<List<String>>)mixin);
+        this.parentMixin = (PathImpl<List<String>>)mixin;
     }
     
     @Override
@@ -98,12 +108,12 @@ public class MultiValueStringListPath<Q extends SimpleExpression<String>> extend
 
     @Override
     public PathMetadata<?> getMetadata() {
-        return pathMixin.getMetadata();
+        return parentMixin.getMetadata();
     }
 
     @Override
     public Path<?> getRoot() {
-        return pathMixin.getRoot();
+        return parentMixin.getRoot();
     }
 
     @Override
