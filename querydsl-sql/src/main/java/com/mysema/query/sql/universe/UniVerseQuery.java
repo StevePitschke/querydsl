@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
 import com.mysema.query.DefaultQueryMetadata;
 import com.mysema.query.JoinExpression;
 import com.mysema.query.JoinType;
@@ -33,12 +34,17 @@ import com.mysema.query.sql.RelationalPathBase;
 import com.mysema.query.sql.SQLQuery;
 import com.mysema.query.sql.SQLTemplates;
 import com.mysema.query.sql.UniVerseTemplates;
+import com.mysema.query.types.Constant;
 import com.mysema.query.types.Expression;
 import com.mysema.query.types.FactoryExpression;
 import com.mysema.query.types.MapExpression;
+import com.mysema.query.types.Operation;
 import com.mysema.query.types.OperationImpl;
+import com.mysema.query.types.Operator;
 import com.mysema.query.types.Ops;
 import com.mysema.query.types.Path;
+import com.mysema.query.types.Predicate;
+import com.mysema.query.types.PredicateOperation;
 import com.mysema.query.types.QTuple;
 import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.expr.BooleanOperation;
@@ -132,24 +138,25 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		}
 		
 		List<Expression<?>> newArgs = new ArrayList<Expression<?>>();
-		Map<Class<? extends RelationalPathBase<?>>, List<Path<?>>> listArgs =
-			new HashMap<Class<? extends RelationalPathBase<?>>, List<Path<?>>>();
+		Map<Class<? extends RelationalPathBase<?>>, List<Expression<?>>> listArgs =
+			new HashMap<Class<? extends RelationalPathBase<?>>, List<Expression<?>>>();
 		RelationalPathBase<?> queryObj = (RelationalPathBase<?>)joins.get(0).getTarget();
 		
 		for (Expression<?> expr : args) {
 			
-			if (expr instanceof MultiValueListPath) {
+			Class<? extends RelationalPathBase<?>> subQueryClass =
+					isMultiValuedExpression(expr, queryObj, null);
+			
+			if (subQueryClass != null) {
 				
-				Class<? extends RelationalPathBase<?>> subQuery =
-					queryObj.getMetadata((Path<?>)expr).getSubQuery();
-				List<Path<?>> list = listArgs.get(subQuery);
+				List<Expression<?>> list = listArgs.get(subQueryClass);
 				
 				if (list == null) {
-					list = new ArrayList<Path<?>>();
-					listArgs.put(subQuery, list);
+					list = new ArrayList<Expression<?>>();
+					listArgs.put(subQueryClass, list);
 				}
 				
-				list.add((Path<?>)expr);
+				list.add(expr);
 				
 			} else {
 				newArgs.add(expr);
@@ -193,9 +200,62 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 		QTuple qtuple = null;
 		int rowCount = 0;
 		
-		List<RelationalPathBase<?>> subQueryObjects = new ArrayList<RelationalPathBase<?>>();		
-		List<List<Path<?>>> selectFieldLists = new ArrayList<List<Path<?>>>();
+		List<RelationalPathBase<?>> subQueryObjects = new ArrayList<RelationalPathBase<?>>();
+		List<List<Expression<?>>> selectFieldLists = new ArrayList<List<Expression<?>>>();
 		
+		for (Class<? extends RelationalPathBase<?>> subQueryClass : listArgs.keySet()) {
+			
+			RelationalPathBase<?> subQueryObj;
+			try {
+				subQueryObj = subQueryClass.getConstructor(String.class).newInstance("SUB_QUERY");
+				subQueryObjects.add(subQueryObj);
+			} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+				// XXX - can't happen.
+				throw new IllegalStateException(e);
+			}
+			
+			List<Expression<?>> selectFields = new ArrayList<Expression<?>>();
+			
+			for (Expression<?> multiValuedExpr : listArgs.get(subQueryClass)) {					
+				selectFields.add(rewriteMultiValuedExpression(multiValuedExpr, subQueryObj));
+				qlist.add(multiValuedExpr);
+			}
+			
+			selectFieldLists.add(selectFields);
+		}
+		
+		Map<Class<? extends RelationalPathBase<?>>, List<Expression<?>>> whenClauses =
+				new HashMap<Class<? extends RelationalPathBase<?>>, List<Expression<?>>>();
+		
+        for (BooleanOperation when : this.whenClauses) {
+        	
+			Class<? extends RelationalPathBase<?>> subQueryClassForWhen =
+					isMultiValuedExpression(when, queryObj, null);
+		
+			if (subQueryClassForWhen == null) {
+				throw new IllegalArgumentException("When clause not using multi-valued columns: " + when);
+			}
+				
+			List<Expression<?>> list = whenClauses.get(subQueryClassForWhen);
+			
+			if (list == null) {
+				list = new ArrayList<Expression<?>>();
+				whenClauses.put(subQueryClassForWhen, list);
+			}
+			
+			int field = 0;
+			
+			for (Class<? extends RelationalPathBase<?>> subQueryClass : listArgs.keySet()) {
+				
+				RelationalPathBase<?> subQueryObj = subQueryObjects.get(field++);
+				
+				if (subQueryClassForWhen == subQueryObj.getClass()) {				
+					list.add(rewriteMultiValuedPredicate(when, subQueryObj));
+					break;
+				}
+			}
+        }
+        
 		for (Tuple row : results) {
 			
 			List<Object> values = new ArrayList<Object>();			
@@ -208,20 +268,8 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 			
 			for (Class<? extends RelationalPathBase<?>> subQueryClass : listArgs.keySet()) {
 				
-				RelationalPathBase<?> subQueryObj;
-				try {
-					if (rowCount == 0) {
-						subQueryObj = subQueryClass.getConstructor(String.class).newInstance("SUB_QUERY");
-						subQueryObjects.add(subQueryObj);
-					} else {
-						subQueryObj = subQueryObjects.get(fieldCount);
-					}
-				} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-					// XXX - can't happen.
-					throw new IllegalStateException(e);
-				}
-				
-				BooleanExpression where = null;
+				RelationalPathBase<?> subQueryObj = subQueryObjects.get(fieldCount);
+				BooleanExpression where = null;				
 				
 				for (ComparableExpressionBase<?> key : keys) {
 					
@@ -256,48 +304,24 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 					}
 				}
 				
-				List<Path<?>> selectFields = null;
-				
-				if (rowCount == 0) {
-				
-					selectFields = new ArrayList<Path<?>>();
-					
-					for (Path<?> multiValuedField : listArgs.get(subQueryClass)) {
-					
-						for (Path<?> column : subQueryObj.getColumns()) {
-							
-							String colName = column.getMetadata().getName();
-							
-							if (colName.equals(multiValuedField.getMetadata().getName())) {
-								
-								selectFields.add(column);
-								
-								if (rowCount == 0) {
-									qlist.add(multiValuedField);
-								}
-								
-								break;
-							}
-						}
-					}
-					
-					selectFieldLists.add(selectFields);
-				}
-					
-				selectFields = selectFieldLists.get(fieldCount++);
+				List<Expression<?>> selectFields = selectFieldLists.get(fieldCount++);
 					
 		        UniVerseQuery query = new UniVerseQuery(conn)
 		        	.from(subQueryObj)
 		        	.where(where);
 		        
-//		        for (BooleanOperation o : whenClauses) {
-//		        	query = query.where(o);
-//		        }
+				List<Expression<?>> currentWhenClauses = whenClauses.get(subQueryObj.getClass());
+				
+				if (currentWhenClauses != null) {
+					for (Expression<?> when : currentWhenClauses) {
+						query.where((Predicate)when);
+					}
+				}
 		        
 		        List<Tuple> subResults = 
 		            query.list(selectFields.toArray(new Path<?>[selectFields.size()]));
 		        
-				for (Path<?> column : selectFields) {
+				for (Expression<?> column : selectFields) {
 
 					List<Object> multiValue = new ArrayList<Object>();
 					
@@ -381,8 +405,133 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
         q.clone(this);
         return q;
     }
+	
+    private Class<? extends RelationalPathBase<?>> isMultiValuedExpression(Expression<?> expr,
+			RelationalPathBase<?> queryObj, Class<? extends RelationalPathBase<?> > subQueryClass) {
+		
+		if (expr instanceof MultiValueListPath) {
+			
+			Class<? extends RelationalPathBase<?>> newClass = queryObj.getMetadata((Path<?>)expr).getSubQuery();
+			
+			if (subQueryClass == null || subQueryClass == newClass) {
+				return newClass;
+			}
+			
+			throw new IllegalArgumentException("Doesn't support expressions with multi-valued columns from different sub-tables");
+		}
+		
+		if (expr instanceof Constant<?>) {
+			return subQueryClass;
+		}
+		
+		if (expr instanceof Path<?>) {
+			
+			if (subQueryClass == null) {
+				return null;
+			}
+			
+			throw new IllegalArgumentException("Mixed top-level and nested table expressions not supported");
+		}
+		
+		if (! (expr instanceof Operation<?>)) {
+			throw new IllegalStateException("Unknown state in expression evaluation: " + expr);
+		}
+		
+		for (Expression<?> arg : ((Operation<?>)expr).getArgs()) {			
+			subQueryClass = isMultiValuedExpression(arg, queryObj, subQueryClass);
+		}
+		
+		return subQueryClass;
+	}
+
+	private Expression<?> rewriteMultiValuedPredicate(Expression<?> expr, RelationalPathBase<?> subQueryObj) {
+		
+		if (expr instanceof MultiValueListPath) {
+			
+			String name = ((Path<?>)expr).getMetadata().getName();
+			
+			for (Path<?> column : subQueryObj.getColumns()) {
+				
+				String colName = column.getMetadata().getName();
+				
+				if (colName.equals(name)) {
+					return column;
+				}
+			}
+			
+			throw new IllegalStateException("Missing column in sub-table: " + name);
+		}
+		
+		if (expr instanceof Constant<?>) {
+			return expr;
+		}
+		
+		if (expr instanceof Path<?>) {
+			throw new IllegalArgumentException("Mixed top-level and nested table expressions not supported");
+		}
+		
+		if (! (expr instanceof BooleanOperation)) {
+			throw new IllegalStateException("Unknown state in expression evaluation: " + expr);
+		}
+		
+		List<Expression<?>> args = new ArrayList<Expression<?>>();
+		
+		for (Expression<?> arg : ((BooleanOperation)expr).getArgs()) {			
+			args.add(rewriteMultiValuedExpression(arg, subQueryObj));
+		}
+		
+		Predicate predicate =
+				new PredicateOperation((Operator<Boolean>)((Operation<?>)expr).getOperator(),
+						ImmutableList.<Expression<?>>copyOf(args));
+		
+		return predicate;
+	}
     
-    private <D> Expression<D> createAlias(Path<? extends Collection<D>> target, Path<D> alias) {
+	private Expression<?> rewriteMultiValuedExpression(Expression<?> expr,
+			RelationalPathBase<?> subQueryObj) {
+		
+		if (expr instanceof MultiValueListPath) {
+			
+			String name = ((Path<?>)expr).getMetadata().getName();
+			
+			for (Path<?> column : subQueryObj.getColumns()) {
+				
+				String colName = column.getMetadata().getName();
+				
+				if (colName.equals(name)) {
+					return column;
+				}
+			}
+			
+			throw new IllegalStateException("Missing column in sub-table: " + name);
+		}
+		
+		if (expr instanceof Constant<?>) {
+			return expr;
+		}
+		
+		if (expr instanceof Path<?>) {
+			throw new IllegalArgumentException("Mixed top-level and nested table expressions not supported");
+		}
+		
+		if (! (expr instanceof Operation<?>)) {
+			throw new IllegalStateException("Unknown state in expression evaluation: " + expr);
+		}
+		
+		List<Expression<?>> args = new ArrayList<Expression<?>>();
+		
+		for (Expression<?> arg : ((Operation<?>)expr).getArgs()) {			
+			args.add(rewriteMultiValuedExpression(arg, subQueryObj));
+		}
+		
+		Operation<Object> newOp =
+				new OperationImpl<Object>(Object.class, (Operator<Object>)((Operation<?>)expr).getOperator(),
+						ImmutableList.<Expression<?>>copyOf(args));
+		
+		return newOp;
+	}
+    
+	private <D> Expression<D> createAlias(Path<? extends Collection<D>> target, Path<D> alias) {
         return OperationImpl.create(alias.getType(), Ops.ALIAS, target, alias);
     }
 

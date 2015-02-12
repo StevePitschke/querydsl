@@ -41,8 +41,10 @@ public class MultiValueDateListPath<Q extends SimpleExpression<Date>> extends Co
 
 	private static final long serialVersionUID = -1873958849624881622L;
 
-    private final PathImpl<List<Date>> pathMixin;
+    private final MultiValueDateListPath<Q> pathMixin;
 
+    private final PathImpl<List<Date>> parentMixin;
+    
     private final Class<Q> queryType;
 
     @Nullable
@@ -60,11 +62,19 @@ public class MultiValueDateListPath<Q extends SimpleExpression<Date>> extends Co
         this(queryType, metadata, PathInits.DIRECT);
     }
     
+    private MultiValueDateListPath(Class<Q> queryType, PathMetadata<?> metadata, MultiValueDateListPath<Q> parent, PathImpl<List<Date>> mixin) {
+        super(new PathImpl<List<Date>>((Class)List.class, metadata), PathInits.DIRECT);
+        this.queryType = queryType;
+        this.pathMixin = parent;
+        this.parentMixin = mixin;
+    }
+    
     @SuppressWarnings("unchecked")
     public MultiValueDateListPath(Class<Q> queryType, PathMetadata<?> metadata, PathInits inits) {
         super(new PathImpl<List<Date>>((Class)List.class, metadata), inits);
         this.queryType = queryType;
-        this.pathMixin = (PathImpl<List<Date>>)mixin;
+        this.pathMixin = new MultiValueDateListPath<Q>(queryType, metadata, this, (PathImpl<List<Date>>)mixin);
+        this.parentMixin = (PathImpl<List<Date>>)mixin;
     }
     
     @Override
@@ -99,12 +109,12 @@ public class MultiValueDateListPath<Q extends SimpleExpression<Date>> extends Co
 
     @Override
     public PathMetadata<?> getMetadata() {
-        return pathMixin.getMetadata();
+        return parentMixin.getMetadata();
     }
 
     @Override
     public Path<?> getRoot() {
-        return pathMixin.getRoot();
+        return parentMixin.getRoot();
     }
 
     @Override
