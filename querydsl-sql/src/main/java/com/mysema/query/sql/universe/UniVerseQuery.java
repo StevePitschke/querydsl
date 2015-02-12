@@ -257,8 +257,16 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 				
 				RelationalPathBase<?> subQueryObj = subQueryObjects.get(field++);
 				
-				if (subQueryClassForWhen == subQueryObj.getClass()) {				
-					list.add(rewriteMultiValuedPredicate(when, subQueryObj));
+				if (subQueryClassForWhen == subQueryObj.getClass()) {
+					
+					Expression<?> rewrittenWhen = rewriteMultiValuedPredicate(when, subQueryObj);
+					
+					if (! (rewrittenWhen instanceof Predicate)) {
+						throw new IllegalArgumentException("WHEN clause is not a boolean expression: " + when);
+					}
+					
+					list.add(rewrittenWhen);
+					
 					break;
 				}
 			}
@@ -487,11 +495,24 @@ public class UniVerseQuery extends AbstractSQLQuery<UniVerseQuery> {
 			throw new IllegalArgumentException("Mixed top-level and nested table expressions not supported");
 		}
 		
+		List<Expression<?>> args = new ArrayList<Expression<?>>();
+		
+		if (expr instanceof Operation<?>) {
+			
+			for (Expression<?> arg : ((Operation<?>)expr).getArgs()) {			
+				args.add(rewriteMultiValuedExpression(arg, subQueryObj));
+			}
+			
+			Operation<?> operation =
+					new OperationImpl<Object>(Object.class, (Operator<Object>)((Operation<?>)expr).getOperator(),
+							ImmutableList.<Expression<?>>copyOf(args));
+			
+			return operation;
+		}
+		
 		if (! (expr instanceof BooleanOperation)) {
 			throw new IllegalStateException("Unknown state in expression evaluation: " + expr);
 		}
-		
-		List<Expression<?>> args = new ArrayList<Expression<?>>();
 		
 		for (Expression<?> arg : ((BooleanOperation)expr).getArgs()) {			
 			args.add(rewriteMultiValuedExpression(arg, subQueryObj));
