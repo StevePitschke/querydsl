@@ -77,10 +77,10 @@ public class DoQueryActs {
         QueryInventory inventory = new QueryInventory("d"); 
         query = new UniVerseQuery(conn, dialect); 
         results = query.from(inventory)
-            .list(inventory.cost, inventory.description, inventory.orderQty.add(1000), inventory.vendorCode);
+            .list(inventory.cost.add(100), inventory.description, inventory.orderQty.add(1000), inventory.vendorCode);
         
         for (Tuple row : results) {
-        	System.out.println(row.get(inventory.cost) + "\t" + row.get(inventory.description) + "\t" + row.get(2, Object.class) +
+        	System.out.println(row.get(0, Object.class) + "\t" + row.get(inventory.description) + "\t" + row.get(2, Object.class) +
         						"\t" + row.get(inventory.vendorCode));
         }            
         
@@ -96,6 +96,6 @@ public class DoQueryActs {
         						"\t" + record.getVendorCode());
         }            
         
-       conn.close();
+        conn.close();
     }
 }
