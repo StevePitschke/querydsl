@@ -68,7 +68,7 @@ public class DoQueryActs {
             .list(acts.animalId, acts.description, acts.equipCode);
         
         for (Tuple row : results) {
-        	System.out.println(row.get(acts.actNo) + "\t" + row.get(acts.description) + "\t" + row.get(acts.animalId) +
+        	System.out.println(row.get(acts.description) + "\t" + row.get(acts.animalId) +
         						"\t" + row.get(acts.equipCode));
         }            
         
@@ -77,10 +77,10 @@ public class DoQueryActs {
         QueryInventory inventory = new QueryInventory("d"); 
         query = new UniVerseQuery(conn, dialect); 
         results = query.from(inventory)
-            .list(inventory.cost, inventory.description, inventory.orderQty, inventory.vendorCode);
+            .list(inventory.cost, inventory.description, inventory.orderQty.add(1000), inventory.vendorCode);
         
         for (Tuple row : results) {
-        	System.out.println(row.get(inventory.cost) + "\t" + row.get(inventory.description) + "\t" + row.get(inventory.orderQty) +
+        	System.out.println(row.get(inventory.cost) + "\t" + row.get(inventory.description) + "\t" + row.get(2, Object.class) +
         						"\t" + row.get(inventory.vendorCode));
         }            
         
