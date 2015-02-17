@@ -1,5 +1,7 @@
 package com.mysema.query.types;
 
+import com.mysema.query.types.expr.MultiValueList;
+
 
 /**
  * HashCodeVisitor is used for hashCode generation in {@link Expression} implementations.
@@ -48,6 +50,11 @@ public final class HashCodeVisitor implements Visitor<Integer,Void> {
     public Integer visit(TemplateExpression<?> expr, Void context) {
         int result = expr.getTemplate().hashCode();
         return 31 * result + expr.getArgs().hashCode();        
+    }
+
+    @Override
+    public Integer visit(MultiValueList<?> expr, Void context) {
+        return expr.getArgs().hashCode();        
     }
 
 }

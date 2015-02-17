@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
  */
 package com.mysema.query.support;
 
+
+import java.sql.Date;
 
 import com.google.common.collect.ImmutableList;
 import com.mysema.query.types.Constant;
@@ -36,6 +38,10 @@ import com.mysema.query.types.TemplateExpressionImpl;
 import com.mysema.query.types.Templates;
 import com.mysema.query.types.ToStringVisitor;
 import com.mysema.query.types.Visitor;
+import com.mysema.query.types.expr.MultiValueDateList;
+import com.mysema.query.types.expr.MultiValueList;
+import com.mysema.query.types.expr.MultiValueNumberList;
+import com.mysema.query.types.expr.MultiValueStringList;
 import com.mysema.query.types.path.EntityPathBase;
 
 /**
@@ -90,6 +96,28 @@ public class ListAccessVisitor implements Visitor<Expression<?>,Context> {
                 return !context.paths.isEmpty() ? exists(context, predicate) : predicate;           
             } else {
                 return new TemplateExpressionImpl(expr.getType(), expr.getTemplate(), ImmutableList.copyOf(args));    
+            }    
+        } else {
+            return expr;
+        }         
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Expression<?> visit(MultiValueList<?> expr, Context context) {
+        final Expression<?>[] args = new Expression<?>[expr.getArgs().size()];        
+        for (int i = 0; i < args.length; i++) {
+            Context c = new Context();
+            args[i] = expr.getArg(i).accept(this, c);    
+            context.add(c);
+        }
+        if (context.replace) {             
+            if (expr.getType().equals(Date.class)) {
+                return new MultiValueDateList((Expression<Date>[])args);           
+            } else if (expr.getType().equals(String.class)) {
+                return new MultiValueStringList((Expression<String>[])args);           
+            } else {
+                return new MultiValueNumberList((Expression<? extends Number>[])args);    
             }    
         } else {
             return expr;

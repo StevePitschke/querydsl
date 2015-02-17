@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.Set;
 
 import com.mysema.query.JoinExpression;
 import com.mysema.query.QueryMetadata;
+import com.mysema.query.types.expr.MultiValueList;
 
 /**
  * ValidatingVisitor visits expressions and ensures that only known path instances are used
@@ -110,6 +111,14 @@ public final class ValidatingVisitor implements Visitor<Set<Expression<?>>, Set<
             if (arg instanceof Expression<?>) {
                 known = ((Expression<?>)arg).accept(this, known);
             }
+        }
+        return known;
+    }
+
+    @Override
+    public Set<Expression<?>> visit(MultiValueList<?> expr, Set<Expression<?>> known) {
+        for (Expression<?> arg : expr.getArgs()) {
+            known = arg.accept(this, known);
         }
         return known;
     }

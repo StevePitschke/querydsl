@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Mysema Ltd
+ * Copyright 2013-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import com.mysema.query.types.Path;
 import com.mysema.query.types.SubQueryExpression;
 import com.mysema.query.types.TemplateExpression;
 import com.mysema.query.types.Visitor;
+import com.mysema.query.types.expr.MultiValueList;
 
 /**
  * RelationalPathExtractor extracts RelationlPath instances from expressions and queries
@@ -134,6 +135,14 @@ public final class RelationalPathExtractor implements Visitor<Set<RelationalPath
             if (arg instanceof Expression<?>) {
                 known = ((Expression<?>)arg).accept(this, known);
             }
+        }
+        return known;
+    }
+
+    @Override
+    public Set<RelationalPath<?>> visit(MultiValueList<?> expr, Set<RelationalPath<?>> known) {
+        for (Expression<?> arg : expr.getArgs()) {
+            known = arg.accept(this, known);
         }
         return known;
     }

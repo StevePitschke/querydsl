@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import com.mysema.query.support.Expressions;
 import com.mysema.query.support.SerializerBase;
 import com.mysema.query.types.*;
 import com.mysema.query.types.Template.Element;
+import com.mysema.query.types.expr.MultiValueList;
 import com.mysema.query.types.template.NumberTemplate;
 
 /**
@@ -854,6 +855,14 @@ public class SQLSerializer extends SerializerBase<SQLSerializer> {
         } else {
             super.visit(expr, context);
         }
+        return null;
+    }
+
+    @Override
+    public Void visit(MultiValueList<?> expr, Void context) {
+        append("<");
+        super.visit(expr, context);
+        append(">");
         return null;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 package com.mysema.query.types;
+
+import com.mysema.query.types.expr.MultiValueList;
 
 
 /**
@@ -58,6 +60,11 @@ final class ExtractorVisitor implements Visitor<Expression<?>,Void> {
 
     @Override
     public Expression<?> visit(TemplateExpression<?> expr, Void context) {
+        return expr;
+    }
+
+    @Override
+    public Expression<?> visit(MultiValueList<?> expr, Void context) {
         return expr;
     }
     
