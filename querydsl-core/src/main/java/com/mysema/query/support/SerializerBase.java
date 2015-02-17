@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import com.mysema.query.types.Template;
 import com.mysema.query.types.TemplateExpression;
 import com.mysema.query.types.Templates;
 import com.mysema.query.types.Visitor;
+import com.mysema.query.types.expr.MultiValueList;
 
 /**
  * SerializerBase is a stub for Serializer implementations which serialize query metadata to Strings
@@ -235,6 +236,20 @@ public abstract class SerializerBase<S extends SerializerBase<S>> implements Vis
     @Override
     public Void visit(TemplateExpression<?> expr, Void context) {
         handleTemplate(expr.getTemplate(), expr.getArgs());
+        return null;
+    }
+
+    @Override
+    public Void visit(MultiValueList<?> expr, Void context) {
+        boolean isFirst = true;
+        for (Expression<?> arg : expr.getArgs()) {
+        	if (isFirst) {
+        		isFirst = false;
+        	} else {
+        		builder.append(",");
+        	}
+        	handle(arg);
+        }
         return null;
     }
 

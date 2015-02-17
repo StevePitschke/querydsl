@@ -17,48 +17,16 @@ package com.mysema.query.types.expr;
 import javax.annotation.Nullable;
 
 import com.mysema.query.types.Expression;
-import com.mysema.query.types.path.MultiValueNumberListPath;
 
 /**
  * NumberExpression represents a numeric expression
  *
  * @author tiwe
  *
- * @param <E> expression type
+ * @param <T> expression type
  * @see java.lang.Number
  */
-public interface MultiValueNumberListExpression<E extends Number & Comparable<?>, Q extends SimpleExpression<? super E>> {
-
-    /**
-     * Get the absolute value of this expression
-     *
-     * @return abs(this)
-     */
-	NumberExpression<E> abs();
-
-    /**
-     * Get the sum of this and right
-     *
-     * @param right
-     * @return this + right
-     */
-	NumberExpression<E> add(Expression<E> right);
-
-    /**
-     * Get the sum of this and right
-     *
-     * @param right
-     * @return this + right
-     */
-	NumberExpression<E> add(E right);
-
-    /**
-     * Get the sum of this and right
-     *
-     * @param right
-     * @return this + right
-     */
-	<N extends MultiValueNumberListPath<E, Q>> NumberExpression<E> add(N right);
+public interface MultiValueListExpression<E extends Number, Q extends SimpleExpression<? super E>> {
 
     /**
      * Create a {@code this >= right} expression
@@ -209,42 +177,4 @@ public interface MultiValueNumberListExpression<E extends Number & Comparable<?>
      * @see java.lang.Comparable#compareTo(Object)
      */
     <A extends Number & Comparable<?>> BooleanExpression eq (Expression<A> right);
-    
-   /*  
-    * Get the square root of this numeric expressions
-    *
-    * @return sqrt(this)
-    */
-   NumberExpression<Double> sqrt();
-
-   /**
-    * Get the difference of this and right
-    *
-    * @param right
-    * @return this - right<E>
-    */
-   NumberExpression<E> subtract(Expression<E> right);
-
-   /**
-    * Get the difference of this and right
-    *
-    * @param right
-    * @return this - right
-    */
-   NumberExpression<E> subtract(E right);
-
-   /**
-    * Get the sum of this and right
-    *
-    * @param right
-    * @return this + right
-    */
-	<N extends MultiValueNumberListPath<E, Q>> NumberExpression<E> subtract(N right);
-
-   /**
-    * Get the sum of this expression (aggregation)
-    *
-    * @return sum(this)
-    */;
-   NumberExpression<E> sum();
 }

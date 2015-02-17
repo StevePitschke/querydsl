@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 package com.mysema.query.types;
 
 import javax.annotation.Nullable;
+
+import com.mysema.query.types.expr.MultiValueList;
 
 /**
  * Visitor defines a Visitor signature for {@link Expression} instances.
@@ -63,5 +65,11 @@ public interface Visitor<R,C> {
      */
     @Nullable
     R visit(TemplateExpression<?> expr, @Nullable C context);
+
+    /**
+     * @param expr
+     */
+    @Nullable
+    R visit(MultiValueList<?> expr, @Nullable C context);
 
 }

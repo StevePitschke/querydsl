@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Mysema Ltd
+ * Copyright 2012-2015, Mysema Ltd
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.mysema.query.types.*;
+import com.mysema.query.types.expr.MultiValueList;
 
 /**
  * Extracts the paths that occurs in an expression via breadth first search
@@ -65,6 +66,12 @@ public final class PathsExtractor implements Visitor<Void, List<Path<?>>> {
 
     @Override
     public Void visit(TemplateExpression<?> expr, List<Path<?>> paths) {
+        visit(expr.getArgs(), paths);
+        return null;
+    }
+
+    @Override
+    public Void visit(MultiValueList<?> expr, List<Path<?>> paths) {
         visit(expr.getArgs(), paths);
         return null;
     }

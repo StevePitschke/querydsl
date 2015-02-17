@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Mysema Ltd
+ * Copyright 2014-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 package com.mysema.query.support;
 
 import javax.annotation.Nullable;
+
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,6 +23,10 @@ import java.util.Objects;
 import com.google.common.collect.ImmutableList;
 import com.mysema.query.*;
 import com.mysema.query.types.*;
+import com.mysema.query.types.expr.MultiValueDateList;
+import com.mysema.query.types.expr.MultiValueList;
+import com.mysema.query.types.expr.MultiValueNumberList;
+import com.mysema.query.types.expr.MultiValueStringList;
 import com.mysema.query.types.template.BooleanTemplate;
 
 /**
@@ -152,6 +158,26 @@ public class ReplaceVisitor implements Visitor<Expression<?>, Void> {
                 return BooleanTemplate.create(expr.getTemplate(), args);
             } else {
                 return new TemplateExpressionImpl(expr.getType(), expr.getTemplate(), args);
+            }
+        }
+    }
+
+    @Override
+    public Expression<?> visit(MultiValueList<?> expr, @Nullable Void context) {
+        ImmutableList.Builder builder = ImmutableList.builder();
+        for (Expression<?> arg : expr.getArgs()) {
+            builder.add(arg.accept(this, null));
+        }
+        ImmutableList args = builder.build();
+        if (args.equals(expr.getArgs())) {
+            return expr;
+        } else {
+            if (expr.getType().equals(Date.class)) {
+                return new MultiValueDateList((ImmutableList<Expression<Date>>)args);        
+            } else if (expr.getType().equals(String.class)) {
+                return new MultiValueStringList((ImmutableList<Expression<String>>)args);           
+            } else {
+                return new MultiValueNumberList(expr.getType(), (ImmutableList<Expression<? extends Number>>)args);    
             }
         }
     }

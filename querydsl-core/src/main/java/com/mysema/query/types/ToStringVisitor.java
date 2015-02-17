@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@ package com.mysema.query.types;
 
 import java.util.Arrays;
 import java.util.List;
+
+import com.mysema.query.types.expr.MultiValueList;
 
 /**
  * ToStringVisitor is used for toString() serialization in {@link Expression} implementations.
@@ -123,6 +125,17 @@ public final class ToStringVisitor implements Visitor<String,Templates> {
                 builder.append(rv.toString());
             }
         }
+        return builder.toString();
+    }
+
+    @Override
+    public String visit(MultiValueList<?> expr, Templates templates) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("<");
+        for (Expression<?> arg : expr.getArgs()) {
+            builder.append(arg.accept(this, templates));
+        }
+        builder.append(">");
         return builder.toString();
     }
 
