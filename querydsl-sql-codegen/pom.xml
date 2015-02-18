@@ -33,6 +33,13 @@
     </dependency>
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-sql</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-spatial</artifactId>
       <version>${parent.version}</version>
     </dependency>        
@@ -117,7 +124,7 @@
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-core</artifactId>
-      <version>3.6.2.BUILD-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>       
