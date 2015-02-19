@@ -14,8 +14,6 @@
 
 package com.mysema.query.types.expr;
 
-import javax.annotation.Nullable;
-
 import com.mysema.query.types.Expression;
 
 /**

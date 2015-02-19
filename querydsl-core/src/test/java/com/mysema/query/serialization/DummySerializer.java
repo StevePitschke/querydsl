@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,12 @@
  */
 package com.mysema.query.serialization;
 
+import java.util.List;
+
 import com.mysema.query.support.SerializerBase;
 import com.mysema.query.types.FactoryExpression;
 import com.mysema.query.types.ParamExpression;
+import com.mysema.query.types.Path;
 import com.mysema.query.types.SubQueryExpression;
 import com.mysema.query.types.Templates;
 
@@ -39,5 +42,10 @@ public class DummySerializer extends SerializerBase<DummySerializer>{
     public Void visit(ParamExpression<?> expr, Void context) {
         return null;
     }
+
+	@Override
+	public List<Path<?>> getConstantPaths() {
+		return null;
+	}
 
 }

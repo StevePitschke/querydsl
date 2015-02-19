@@ -108,6 +108,7 @@ public class SQLSerializer extends SerializerBase<SQLSerializer> {
         return constants;
     }
 
+    @Override
     public List<Path<?>> getConstantPaths() {
         return constantPaths;
     }
@@ -546,6 +547,8 @@ public class SQLSerializer extends SerializerBase<SQLSerializer> {
                 for (int i = 0; i < columns.size(); i++) {
                     if (values.get(i) instanceof Constant<?>) {
                         constantPaths.add(columns.get(i));
+                	} else if (values.get(i) instanceof MultiValueList<?>) {
+                		((MultiValueList<?>)values.get(i)).setLhs(columns.get(i));
                     }
                 }
             }
@@ -592,8 +595,12 @@ public class SQLSerializer extends SerializerBase<SQLSerializer> {
             }
             handle(update.getFirst());
             append(" = ");
-            if (!useLiterals && update.getSecond() instanceof Constant<?>) {
-                constantPaths.add(update.getFirst());
+            if (!useLiterals) {
+            	if (update.getSecond() instanceof Constant<?>) {
+                    constantPaths.add(update.getFirst());
+            	} else if (update.getSecond() instanceof MultiValueList<?>) {
+            		((MultiValueList<?>)update.getSecond()).setLhs(update.getFirst());
+            	}
             }
             handle(update.getSecond());
             first = false;
