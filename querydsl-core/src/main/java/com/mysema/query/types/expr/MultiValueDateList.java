@@ -18,6 +18,7 @@ import java.sql.Date;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.mysema.query.types.ConstantImpl;
 import com.mysema.query.types.Expression;
 import com.mysema.query.types.Visitor;
 
@@ -25,18 +26,22 @@ import com.mysema.query.types.Visitor;
  * @author Steve Pitschke
  * @param <T>
  */
-public class MultiValueDateList implements MultiValueList<Date> {
+public class MultiValueDateList extends MultiValueList<Date> {
 
 	private static final long serialVersionUID = -5280847437593738599L;
 
     private final ImmutableList<Expression<Date>> args;
     
-    public MultiValueDateList(@SuppressWarnings("unchecked") Expression<Date>...args) {
+    public MultiValueDateList(Expression<Date>...args) {
     	this(ImmutableList.<Expression<Date>>copyOf(args));
     }
     
     public MultiValueDateList(ImmutableList<Expression<Date>> args) {
 		this.args = args;
+	}
+
+	public MultiValueDateList(Date... args) {
+		this.args = ImmutableList.copyOf(convertToExpressions(args));
 	}
 
      public final Expression<Date> getArg(int index) {
@@ -52,9 +57,11 @@ public class MultiValueDateList implements MultiValueList<Date> {
         return v.visit(this, context);
 	}
 
-	@Override
-	public Class<Date> getType() {
-		return Date.class;
-	}
-
+    private static Expression<Date>[] convertToExpressions(Date... args) {
+        Expression<?>[] exprs = new Expression<?>[args.length];
+        for (int i = 0; i < args.length; i++) {
+            exprs[i] = new ConstantImpl(args[i]);
+        }
+        return (Expression<Date>[])exprs;
+    }
 }

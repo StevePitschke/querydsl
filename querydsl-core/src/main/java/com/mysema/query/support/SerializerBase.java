@@ -194,6 +194,8 @@ public abstract class SerializerBase<S extends SerializerBase<S>> implements Vis
     public void setStrict(boolean strict) {
         this.strict = strict;
     }
+    
+    public abstract List<Path<?>> getConstantPaths();
 
     @Override
     public String toString() {
@@ -247,6 +249,9 @@ public abstract class SerializerBase<S extends SerializerBase<S>> implements Vis
         		isFirst = false;
         	} else {
         		builder.append(",");
+        	}
+        	if (arg instanceof Constant<?>) {
+        		getConstantPaths().add(expr.getLhs());
         	}
         	handle(arg);
         }

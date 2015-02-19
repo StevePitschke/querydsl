@@ -27,7 +27,7 @@ import com.mysema.query.types.Visitor;
  * @author Steve Pitschke
  * @param <E>
  */
-public class MultiValueNumberList<E extends Number> implements MultiValueList<E> {
+public class MultiValueNumberList<E extends Number> extends MultiValueList<E> {
 
 	private static final long serialVersionUID = -5280847437593738599L;
 
@@ -66,11 +66,6 @@ public class MultiValueNumberList<E extends Number> implements MultiValueList<E>
 	@Override
 	public <R, C> R accept(Visitor<R, C> v, C context) {
         return v.visit(this, context);
-	}
-
-	@Override
-	public Class<E> getType() {
-		return elementType;
 	}
 
     private static <T extends Number> Expression<T>[] convertToExpressions(T... args) {

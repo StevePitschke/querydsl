@@ -14,25 +14,38 @@
 
 package com.mysema.query.types.expr;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mysema.query.types.Expression;
-import com.mysema.query.types.Visitor;
+import com.mysema.query.types.Path;
 
 /**
  * @author Steve Pitschke
  * @param <T>
  */
-public interface MultiValueList<E> extends Expression<E> {
+public abstract class MultiValueList<E> implements Expression<List<E>> {
 	
-	Expression<?> getArg(int i);
+	private static final long serialVersionUID = 5082526845087177862L;
+	
+	private List<E> type = new ArrayList<E>(0);
+	
+	private Path<?> lhs = null;
 
-    List<Expression<E>> getArgs();
+	public abstract Expression<?> getArg(int i);
 
-	@Override
-	<R, C> R accept(Visitor<R, C> v, C context);
+	public abstract List<Expression<E>> getArgs();
+	
+	public final void setLhs(Path<?> lhs) {
+		this.lhs = lhs;
+	}
+	
+	public final Path<?> getLhs() {
+		return lhs;
+	}
 
-	@Override
-	Class<E> getType();
-
+    @Override
+    public final Class<? extends List<E>> getType() {
+        return (Class<? extends List<E>>) type.getClass();
+    }
 }

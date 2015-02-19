@@ -14,10 +14,10 @@
 
 package com.mysema.query.types.expr;
 
-import java.sql.Date;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.mysema.query.types.ConstantImpl;
 import com.mysema.query.types.Expression;
 import com.mysema.query.types.Visitor;
 
@@ -25,7 +25,7 @@ import com.mysema.query.types.Visitor;
  * @author Steve Pitschke
  * @param <T>
  */
-public class MultiValueStringList implements MultiValueList<String> {
+public class MultiValueStringList extends MultiValueList<String> {
 
 	private static final long serialVersionUID = -5280847437593738599L;
 	
@@ -37,6 +37,10 @@ public class MultiValueStringList implements MultiValueList<String> {
     
     public MultiValueStringList(ImmutableList<Expression<String>> args) {
 		this.args = args;
+	}
+
+	public MultiValueStringList(String... args) {
+		this.args = ImmutableList.copyOf(convertToExpressions(args));
 	}
 
      public final Expression<String> getArg(int index) {
@@ -52,9 +56,11 @@ public class MultiValueStringList implements MultiValueList<String> {
         return v.visit(this, context);
 	}
 
-	@Override
-	public Class<String> getType() {
-		return String.class;
-	}
-
+    private static Expression<String>[] convertToExpressions(String... args) {
+        Expression<?>[] exprs = new Expression<?>[args.length];
+        for (int i = 0; i < args.length; i++) {
+            exprs[i] = new ConstantImpl(args[i]);
+        }
+        return (Expression<String>[])exprs;
+    }
 }
