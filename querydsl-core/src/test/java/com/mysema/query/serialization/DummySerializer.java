@@ -48,4 +48,9 @@ public class DummySerializer extends SerializerBase<DummySerializer>{
 		return null;
 	}
 
+	@Override
+	public boolean useLiterals() {
+		return false;
+	}
+
 }
