@@ -74,4 +74,9 @@ public class UniVerseTemplates extends SQLTemplates {
 	public String quoteIdentifier(String identifier, boolean precededByDot) {
 		return identifier;
 	}
+
+	@Override
+	public boolean usePreparedStatement() {
+		return false;
+	}
 }
