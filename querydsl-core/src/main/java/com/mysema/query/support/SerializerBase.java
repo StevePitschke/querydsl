@@ -197,6 +197,8 @@ public abstract class SerializerBase<S extends SerializerBase<S>> implements Vis
     
     public abstract List<Path<?>> getConstantPaths();
 
+    public abstract boolean useLiterals();
+    
     @Override
     public String toString() {
         if (normalize) {
@@ -250,7 +252,7 @@ public abstract class SerializerBase<S extends SerializerBase<S>> implements Vis
         	} else {
         		builder.append(",");
         	}
-        	if (arg instanceof Constant<?>) {
+        	if (! useLiterals() && arg instanceof Constant<?>) {
         		getConstantPaths().add(expr.getLhs());
         	}
         	handle(arg);

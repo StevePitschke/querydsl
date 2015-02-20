@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,6 +106,7 @@ public class SQLUpdateClause extends AbstractSQLClause<SQLUpdateClause> implemen
     private PreparedStatement createStatement() throws SQLException{
         listeners.preRender(context);
         SQLSerializer serializer = createSerializer();
+        serializer.setUseLiterals(! configuration.getTemplates().usePreparedStatement());
         serializer.serializeUpdate(metadata, entity, updates);
         queryString = serializer.toString();
         constants = serializer.getConstants();
@@ -126,6 +127,7 @@ public class SQLUpdateClause extends AbstractSQLClause<SQLUpdateClause> implemen
         boolean addBatches = !configuration.getUseLiterals();
         listeners.preRender(context);
         SQLSerializer serializer = createSerializer();
+        serializer.setUseLiterals(! configuration.getTemplates().usePreparedStatement());
         serializer.serializeUpdate(batches.get(0).getMetadata(), entity, batches.get(0).getUpdates());
         queryString = serializer.toString();
         constants = serializer.getConstants();

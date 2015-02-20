@@ -971,6 +971,11 @@ public class SQLSerializer extends SerializerBase<SQLSerializer> {
     public void setUseLiterals(boolean useLiterals) {
         this.useLiterals = useLiterals;
     }
+    
+    @Override
+    public boolean useLiterals() {
+    	return useLiterals;
+    }
 
     protected void setSkipParent(boolean b) {
         skipParent = b;

@@ -957,6 +957,10 @@ public class SQLTemplates extends Templates {
         }
     }
 
+	public boolean usePreparedStatement() {
+		return true;
+	}
+	
     /**
      * template method for LIMIT and OFFSET serialization
      *
