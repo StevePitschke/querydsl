@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Mysema Ltd
+ * Copyright 2011-2015, Mysema Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public abstract class AbstractSQLQuery<Q extends AbstractSQLQuery<Q>> extends Pr
     }
  
     public AbstractSQLQuery(@Nullable Connection conn, Configuration configuration, QueryMetadata metadata) {
-        super(new QueryMixin<Q>(metadata, false), configuration);
+        super(conn, new QueryMixin<Q>(metadata, false), configuration);
         this.conn = conn;
         this.listeners = new SQLListeners(configuration.getListeners());
         this.useLiterals = configuration.getUseLiterals();
@@ -285,9 +285,64 @@ public abstract class AbstractSQLQuery<Q extends AbstractSQLQuery<Q>> extends Pr
         }
     }
 
+	@Override
+	public <RT> List<RT> list(Expression<RT> expr) {
+		
+    	if (! configuration.getTemplates().usesMultiValuedColumns()  || recursedThruList) {
+			return doList(expr);
+		}
+		
+		List<JoinExpression> joins = getMetadata().getJoins();
+		
+		if (joins.size() > 1) {
+			return doList(expr);
+		}
+		
+		RelationalPathBase<?> queryObj = (RelationalPathBase<?>)joins.get(0).getTarget();
+		boolean hasMultiValuedColumns = false;
+		
+		for (Path<?> column : queryObj.getColumns()) {
+			if (queryObj.getMetadata(column).isMultiValued()) {
+				hasMultiValuedColumns = true;
+				break;
+			}
+		}
+		
+		if (! hasMultiValuedColumns) {
+			return doList(expr);
+		}
+		
+		Expression<RT> tranformedExpr = queryMixin.addProjection(expr);
+        final List<RT> rv = new ArrayList<RT>();
+    	List<Path<?>> columns = queryObj.getColumns();
+    	Object[] row = new Object[columns.size()];
+    	 		
+        if (tranformedExpr instanceof FactoryExpression) {
+        	
+    		recursedThruList = true;
+    		
+        	List<Tuple> tuples = list(columns.toArray(new Path<?>[columns.size()]));
+        	
+    		recursedThruList = false;
+    		
+        	for (Tuple tuple : tuples) {
+        		
+        		for (int idx = 0; idx < columns.size(); idx++) {
+        			row[idx] = tuple.get(columns.get(idx));
+        		}
+        		
+        		rv.add(((FactoryExpression<RT>)tranformedExpr).newInstance(row));
+        	}
+        	
+        } else {
+        	throw new IllegalStateException("Not sure what to do with this: " + expr);
+        }
+        
+        return rv;
+	}
+
     @SuppressWarnings("unchecked")
-    @Override
-    public <RT> List<RT> list(Expression<RT> expr) {
+    private <RT> List<RT> doList(Expression<RT> expr) {
         expr = queryMixin.addProjection(expr);
         SQLListenerContextImpl context = startContext(conn, queryMixin.getMetadata());
         String queryString = null;
@@ -545,7 +600,4 @@ public abstract class AbstractSQLQuery<Q extends AbstractSQLQuery<Q>> extends Pr
     public Q clone() {
         return this.clone(this.conn);
     }
-    
-    public abstract Q clone(Connection connection);
-
 }
