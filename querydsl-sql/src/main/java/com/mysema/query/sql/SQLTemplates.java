@@ -280,6 +280,8 @@ public class SQLTemplates extends Templates {
     private boolean arraysSupported = true;
 
     private int listMaxSize = 0;
+    
+    private boolean usesMultiValuedColumns = false;
 
     private boolean supportsUnquotedReservedWordsAsIdentifier = false;
 
@@ -961,6 +963,10 @@ public class SQLTemplates extends Templates {
 		return true;
 	}
 	
+    public boolean usesMultiValuedColumns() {
+		return usesMultiValuedColumns;
+	}
+
     /**
      * template method for LIMIT and OFFSET serialization
      *

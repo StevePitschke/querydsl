@@ -79,4 +79,9 @@ public class UniVerseTemplates extends SQLTemplates {
 	public boolean usePreparedStatement() {
 		return false;
 	}
+
+	@Override
+	public boolean usesMultiValuedColumns() {
+		return true;
+	}
 }
